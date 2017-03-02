@@ -1,3 +1,10 @@
+#+AUTHOR: emacsist
+#+CREATOR: emacsist
+#+DATE: <2017-03-02 Thu>
+#+EMAIL: emacsist@qq.com
+#+LANGUAGE: zh
+#+TITLE: Org mode 手册学习笔记
+
 * 学习 org-mode
 
 ** 查看当前使用的 org-mode 版本
@@ -54,6 +61,10 @@
 
 ** 将 Org 显示为显示以 UTF-8 的字符来显示。
    比如在链接中，Org 会像 HTML 那个，将 description 显示，而隐藏了 link。如果这时想完整显示纯文本内容的话，就可以按如下按键：*C-c C-x \*
+
+
+** 语言代码列表
+   [[https://www.loc.gov/standards/iso639-2/php/code_list.php][iso language code]]
 
    
 *  Org 手册
@@ -2582,7 +2593,7 @@
      - ': => Toggle smart quotes (org-export-with-smart-quotes)
      - *: => Toggle emphasized text (org-export-with-emphasize).
      - -: => Toggle conversion of special strings (org-export-with-special-strings).
-     - :: => Toggle  xed-width sections (org-export-with-fixed-width).
+     - '::' => Toggle fixed-width sections (org-export-with-fixed-width).
      - <: => Toggle inclusion of any time/date active/inactive stamps (org-export-with- timestamps).
      - \n => Toggle line-break-preservation (org-export-preserve-breaks).
      - ^: => Toggle TEX-like syntax for sub- and superscripts.
