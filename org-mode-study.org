@@ -8,27 +8,28 @@
 * 学习 org-mode
 
 ** 查看当前使用的 org-mode 版本
-   #+BEGIN_EXPORT ascii
+   #+BEGIN_EXAMPLE
    M-x org-version
-   #+END_EXPORT
+   #+END_EXAMPLE
 
 
 ** 插入一个 tab 字符
-   #+BEGIN_EXPORT ascii
+   #+BEGIN_EXAMPLE
    C-q TAB
-   #+END_EXPORT
+   #+END_EXAMPLE
 
 
 ** 查看变量的值
-   #+BEGIN_EXPORT ascii
+
+   #+BEGIN_EXAMPLE
    C-h v your-var-name
-   #+END_EXPORT
+   #+END_EXAMPLE
 
 
 ** 快速输入模板
     以 *<* 开头，然后再以下面一个字母来表示想输入的模板，然后再按一下 TAB 即可。
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     s	#+BEGIN_SRC ... #+END_SRC 
     e	#+BEGIN_EXAMPLE ... #+END_EXAMPLE
     q	#+BEGIN_QUOTE ... #+END_QUOTE 
@@ -42,21 +43,21 @@
     A	#+ASCII: 
     i	#+INDEX: line 
     I	#+INCLUDE: line 
-    #+END_EXPORT
+    #+END_EXAMPLE
 
 
 ** 在表格中进行计算
    在表格的下面，添加
-   #+BEGIN_EXPORT ascii
+   #+BEGIN_EXAMPLE
    #+TBLFM: $1=$2+$3::第二个表达式::第三个表达式
-   #+END_EXPORT
+   #+END_EXAMPLE
    $1：表示第一列，以此类推。填写完表达式后，将光标移动到表达式所在的位置，然后按 *C-c C-c* ，这样子就会进行表达式计算并填充值到相应的单元中了。
 
 
 ** 查看 emacs 版本
-   #+BEGIN_EXPORT ascii
+   #+BEGIN_EXAMPLE
    M-x emacs-version RET
-   #+END_EXPORT
+   #+END_EXAMPLE
 
 
 ** 将 Org 显示为显示以 UTF-8 的字符来显示。
@@ -80,9 +81,9 @@
      | S-up/down/left/right | Shift the reference at point                                                                                                                   | org-table-fedit-line-up / org-table-fedit-line-down |
      | M-S-up / M-S-down    | Move the test line for column formulas in the Org bu er up and                                                                                 |                                                     |
      | M-up / M-down        | Scroll the window displaying the tableystem
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      M-x package-install RET abcdefghijklmnopqlksdfljksadflskdflsdjforg
-     #+END_EXPORT
+     #+END_EXAMPLE
      
      注意，你需要在一个没有打开过任何 *.org* 文件的会话中执行这个命令。
 
@@ -92,25 +93,25 @@
 ***** [[http://orgmode.org/][Org's Website]] 下载归档文件
 
       下载完毕后，添加以下的配置到你的 Emacs init 文件中：
-      #+BEGIN_EXPORT ascii
+      #+BEGIN_EXAMPLE
       (add-to-list 'load-path "~/path/to/orgdir/lisp")
-      #+END_EXPORT
+      #+END_EXAMPLE
 
 		  想使用 Org 的第三库，则可以在你的 init 配置文件中，也加入以下配置
 
-      #+BEGIN_EXPORT ascii
+      #+BEGIN_EXAMPLE
       (add-to-list 'load-path "~/path/to/orgdir/contrib/lisp" t)
-      #+END_EXPORT
+      #+END_EXAMPLE
 
 		  你也可以编译这些文件，然后安装到你的系统中。请用 *make help* 来查看编译和安装的选项。
 
 
 **** 使用 Org 的 git 仓库
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      $ cd ~/src/
      $ git clone git://orgmode.org/org-mode.git
      $ make autoloads
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 		  注意，这里的 *make autoloads* 是强制的。执行完后，请记得按上面方法的描述，加入到正确的 *load-path* 中。同样也可以使用 *make help* 来查看编译和安装的选项。
 
@@ -118,12 +119,12 @@
 *** 激活 Org
 
 **** 4个 Org 命令应该通过全局的 key 来访问
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      (global-set-key "\C-cl" 'org-store-link)
      (global-set-key "\C-ca" 'org-agenda)
      (global-set-key "\C-cc" 'org-capture)
      (global-set-key "\C-cb" 'org-iswitchb)
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 			按键请绑定为你自己的适合的。
 
@@ -132,14 +133,14 @@
 
 
 **** 文件中第一行的内容类似如下的，也会使用 Org mode
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      MY PROJECTS    -*- mode: org; -*-
-     #+END_EXPORT
+     #+END_EXAMPLE
 
      可以查看变量 *org-insert-mode-line-in-empty-file* (C-h v org-insert-mode-line-in-empty-file) 的描述。默认是 nil 值。如果为非 nil，在会在空白文件的第一行，插入这指示使用 org-mode 的标志。开启后，之后就会在空白文件上使用 org-mode 时，它就会插入以下内容在第一行中:
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      #    -*- mode: org -*-
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 
 ** 第二章：文档结构
@@ -152,7 +153,7 @@
 
     标题，在左边以一个或多个星号开始的然后空至少一个空格输入标题。例如下面的例子
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     * Top level headline
 
     ** Second level
@@ -165,7 +166,7 @@
 
     
     * Another top level headline
-    #+END_EXPORT
+    #+END_EXAMPLE
 
 		注意，在层级中最后一个空行，被视作为层级的一部分。（所以，如果你想要在 TAB 时看到空一行的话，实际要输入2个空行）
 
@@ -201,12 +202,12 @@
 
 *** 初始可见性
     当 emacs 第一次访问 Org 文件，全局状态是 OVERVIEW（概述），例如：只有顶层的标题是可见的。这个可以通过配置变量 *org-startup-folded* 或者在每个文件的基础上，加上以下内容中的一行来控制：
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     #+STARTUP: overview
     #+STARTUP: content
     #+STARTUP: showall
     #+STARTUP: showeverything
-    #+END_EXPORT
+    #+END_EXAMPLE
 
 		在任何一个入口中，设置一个 *VISIBILITY* 属性可以来控制它们的可见性。允许的值有：
 
@@ -277,17 +278,17 @@
     列表的层次是用缩进来表示的
 
 **** 无序
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      - item1
      + item2
      * item3
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 **** 有序
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      1. item1
      2) item2
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 **** 列表的描述
      在列表后面加上 * :: * 来添加描述（用于无序列表上）
@@ -313,7 +314,7 @@
 *** Drawers 抽屉
     有时，你想保留一些与入口相关的信息，但你通常不想看到它。这时，就可以用 drawers。他们可以包含任何内容，除了标题和其他的抽屉（即不能嵌套抽屉）。drawers 类似如下：
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     
     ** This is a headline
         Still outside the drawer
@@ -322,44 +323,44 @@
         :END:
         After the drawer.
 
-    #+END_EXPORT
+    #+END_EXAMPLE
 
      可以在当前光标下插入 drawer，(M-x org-insert-drawer，绑定到了 C-c C-x d)。当激活一个区域时，这个命令会将这些区域包含在 drawer 里面。
 
 **** C-c C-z 
      添加一个时间戳的标注到 LOGBOOK 抽屉，类似如下：
 
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      - Note taken on [2017-02-25 Sat 13:24]
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 *** 块
      Org 使用 *begin...end* 块来达到各种不同的目的。可以通过 TAB 来折叠或显示这些。类似如下：
      
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      #+STARTUP: hideblocks
      #+STARTUP: nohideblocks
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 *** 脚注
     1. 例子1
-	    #+BEGIN_EXPORT ascii
+	    #+BEGIN_EXAMPLE
 	    The Org homepage[fn:1] now looks a lot better than it used to.
 	     ...
 	    [fn:1] The link is: http://orgmode.org
-  	  #+END_EXPORT
+  	  #+END_EXAMPLE
     2. 例子2
-       #+BEGIN_EXPORT ascii
+       #+BEGIN_EXAMPLE
        [fn:name]
-       #+END_EXPORT
+       #+END_EXAMPLE
     3. 例子3
-       #+BEGIN_EXPORT ascii
+       #+BEGIN_EXAMPLE
        [fn::This is the inline definition of this footnote]
-       #+END_EXPORT
+       #+END_EXAMPLE
     4. 例子4
-       #+BEGIN_EXPORT ascii
+       #+BEGIN_EXAMPLE
        [fn:name:a definition]
-       #+END_EXPORT
+       #+END_EXAMPLE
 
 **** 操作
      * 插入脚注： C-c C-x f
@@ -393,16 +394,16 @@
 
     任何以 *|-* 开头的行，都被视作是水平分隔线，它会在下次自动重排时填充整个表格的宽度。所以，创建一个上面的表格，你只需要输入：
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     |Name | Phone | Age|
     |-
-    #+END_EXPORT
+    #+END_EXAMPLE
 
     然后再按下 *TAB* 即可。更快的输入可以是，先输入 
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     |Name | Phone | Age
-    #+END_EXPORT
+    #+END_EXAMPLE
 
     然后再输入 *C-c RET* 
 
@@ -412,9 +413,9 @@
      | C-c \vert | Convert the active region to a table                                         | org-table-create-or-convert-from-region |
 
      转换表格时，如果每行至少包含一个 TAB，则以 TAB 为分隔。否则如果有逗号，则以逗号分隔，也没有的话，就以空格来分隔。你也可通过以下命令来强制指定
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      C-u forces CSV, C-u C-u forces TAB, C-u C-u C-u will prompt for a regular expression to match the separator, and a numeric argument N indicates that at least N consecutive spaces, or alternatively a TAB will be the separator
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 **** 重排和字段操作
      | shortcut | desc                                                                         | command                      |
@@ -465,11 +466,11 @@
 
 **** 表格中输入特殊字符
      * 输入 *|* 字符
-       #+BEGIN_EXPORT ascii
+       #+BEGIN_EXAMPLE
        If \vert is not automatically converted to |, call org-toggle-pretty-entities
 
        To insert a vertical bar into a table  eld, use \vert or, inside a word abc\vert{}def.
-       #+END_EXPORT
+       #+END_EXAMPLE
        
 
 *** 列宽度和对齐
@@ -505,9 +506,9 @@
 *** Orgtbl minor mode
      如果你想在其他的主模式中使用 org table，你可以激活这个 minor mode: *M-x orgtbl-mode RET* 。例如想在启动时默认在 Message mode 中使用，则可以在 init 文件中加入以下配置：
 
-     #+BEGIN_EXPORT ascii
+     #+BEGIN_EXAMPLE
      (add-hook 'message-mode-hook 'turn-on-orgtbl)
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 
 *** 电子表格
@@ -562,9 +563,9 @@
 ***** 命名引用
       *$name* 解析为列名，参数或者常量。全局常量是通过 *org-table-formula-constants* 定义的。局部常量是通过类似以下的行来定义的：
      
-      #+BEGIN_EXPORT ascii
+      #+BEGIN_EXAMPLE
       #+CONSTANTS: c=299792458. pi=3.14 eps=2.4e-6
-      #+END_EXPORT
+      #+END_EXAMPLE
 
 
       属性也可以作为公式中的常量。对于属性 *:Xyz:* ,它的引用为 *$PROP_Xyz* 
@@ -649,10 +650,10 @@
 
      使用多个 *#+TBLFM:* 行.类似如下：
      
-		 #+BEGIN_EXPORT ascii
+		 #+BEGIN_EXAMPLE
      #+TBLFM: $2=$1*1 
      #+TBLFM: $2=$1*2
-     #+END_EXPORT
+     #+END_EXAMPLE
 
      不过要注意的是，每次应用一行的公式时，都会刷新单元的值。
 
@@ -735,9 +736,9 @@
 
 ** 第四章：超链接
 *** 链接格式
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     [[link][description]] 或者也可以： [[link]]
-    #+END_EXPORT
+    #+END_EXAMPLE
 
     一旦完成后，Org 会将它显示为 'description' 来代替 '[[link][description]]' ， 显示 'link' 来代替 '[[link]]' . 你可以在 link 上，使用 *C-c C-l* 来编辑相应的不可见的 link 部分。
 
@@ -2730,9 +2731,9 @@
     *#+ASCII: Some text*
     或
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     All lines in this block will appear only when using this back-end.
-    #+END_EXPORT
+    #+END_EXAMPLE
 
     ASCII 指定属性
     #+BEGIN_EXAMPLE
@@ -2836,7 +2837,7 @@
 
      #+BEGIN_EXPORT html
      All lines between these markers are exported literally
-     #+END_EXPORT
+     #+END_EXAMPLE
 
 
 **** HTML中链接的导出
@@ -2980,7 +2981,7 @@
 *** 简单模板
     先输入 '<'，然后输入下面的一个字母，最后按 TAB 即可。
 
-    #+BEGIN_EXPORT ascii
+    #+BEGIN_EXAMPLE
     s	#+BEGIN_SRC ... #+END_SRC 
     e	#+BEGIN_EXAMPLE ... #+END_EXAMPLE
     q	#+BEGIN_QUOTE ... #+END_QUOTE 
@@ -2994,8 +2995,7 @@
     A	#+ASCII: 
     i	#+INDEX: line 
     I	#+INCLUDE: line 
-    #+END_EXPORT
-
+    #+END_EXAMPLE
 
 *** 加速键
     参考  *org-use-speed-commands* 变量配置。
