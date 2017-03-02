@@ -1,2 +1,4 @@
-# org-mode
-org-mode study documents
+* 说明
+  该文档是学习 Org mode 手册时的笔记，欢迎提交以及完善文档的issue或 PR。难免会有理解的不对，或漏的地方，也欢迎指出和修改。
+
+
