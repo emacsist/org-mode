@@ -175,30 +175,19 @@
 **** 全局/局部折叠
      *TAB* 和 *S-TAB*
 
-***** TAB(M-x org-cycle)
-      作用于当前顶层的子层级
+     | shortcut        | desc                                     | command                     |
+     |-----------------+------------------------------------------+-----------------------------|
+     | TAB             | 作用于当前顶层的子层级                   | org-cycle                   |
+     | S-TAB           | 作用于整个 buffer                        | org-global-cycle            |
+     | C-u C-u TAB     | 切换到启动时的 buffer 的可见性一样       | org-set-startup-visibility  |
+     | C-u C-u C-u TAB | 显示所有                                 | out-line-show-all           |
+     | C-c C-r         |                                          | org-reveal                  |
+     | C-c C-k         | 显示当前标题的所有子标题                 | outline-show-branches       |
+     | C-c TAB         | 显示所有直接子标题                       | outline-show-children       |
+     | C-c C-x b       | 显示当前及所有子层级到一个新的 buffer 中 | org-tree-to-indirect-buffer |
+     | C-c C-x v       |                                          | org-copy-visible            |
 
-***** S-TAB 或者 C-u TAB (M-x org-global-cycle)
-      作用于整个 buffer
 
-***** C-u C-u TAB (M-x org-set-startup-visibility)
-      切换到启动时的 buffer 的可见性一样
-
-***** C-u C-u C-u TAB (M-x outline-show-all)
-      显示所有
-
-***** C-c C-r (M-x org-reveal)
-      
-***** C-c C-k (M-x outline-show-branches)
-      显示当前标题的所有子标题
-
-***** C-c TAB (M-x outline-show-children)
-       显示所有直接子标题
-
-***** C-c C-x b (M-x org-tree-to-indirect-buffer)
-      显示当前及所有子层级到一个新的 bufer 中去。
-
-***** C-c C-x v (M-x org-copy-visible)
 
 *** 初始可见性
     当 emacs 第一次访问 Org 文件，全局状态是 OVERVIEW（概述），例如：只有顶层的标题是可见的。这个可以通过配置变量 *org-startup-folded* 或者在每个文件的基础上，加上以下内容中的一行来控制：
@@ -232,6 +221,7 @@
 | RET       | Select this location                                                     |                              |
 | /         | Do a Sparse-tree search                                                  |                              |
 
+
 *** 结构编辑
 
   | shortcut    | desc                                                                                                                               | command                                 |
@@ -262,6 +252,7 @@
   | C-c *       | Turn a normal line or plain list item into a headline                                                                              | org-toggle-heading                      |
 
 
+
 *** Sparse trees 过滤显示的内容
 
 | shortcut           | desc                                                                   | command         |
@@ -272,6 +263,7 @@
 | M-g p or M-g M-p   | Jump to the previous sparse tree match in this bu er                   | previous-error  |
 
 这个可以配合 agenda 来使用
+
 
 
 *** 列表
@@ -311,6 +303,7 @@
      | S-left/right          | This command also cycles bullet styles when the cursor in on the bullet or anywhere in an item line                                  |                    |
      | C-c ^                 | Sort the plain list                                                                                                                  |                    |
 
+
 *** Drawers 抽屉
     有时，你想保留一些与入口相关的信息，但你通常不想看到它。这时，就可以用 drawers。他们可以包含任何内容，除了标题和其他的抽屉（即不能嵌套抽屉）。drawers 类似如下：
 
@@ -334,6 +327,7 @@
      - Note taken on [2017-02-25 Sat 13:24]
      #+END_EXAMPLE
 
+
 *** 块
      Org 使用 *begin...end* 块来达到各种不同的目的。可以通过 TAB 来折叠或显示这些。类似如下：
      
@@ -341,6 +335,7 @@
      #+STARTUP: hideblocks
      #+STARTUP: nohideblocks
      #+END_EXAMPLE
+
 
 *** 脚注
     1. 例子1
@@ -367,6 +362,7 @@
      * 脚注和引用之间相互跳转： C-c C-c
      * 进入脚注的连接：C-c C-o
      * 编辑当前光标所在的脚注：C-c '
+
 
 *** Orgstruct minor 模式
     如果你想在其他的主模式中（如 Message mode） 也想使用 Orgmode 的结构来编辑，那么就可以使用 *orgstruct-mode* 来进行辅助编辑。（M-x orgstruct-mode RET）。如果想在 Message mode 下自动打开，则可以加入以下配置到 init 文件的中：
