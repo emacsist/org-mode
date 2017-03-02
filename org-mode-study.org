@@ -74,7 +74,7 @@
 
 *** 安装 Org
 
-    最近的 GNU Emacs 发行版已经包含了 Org 了，所以不需要再额外安装。安装的方式有（强烈建议坚持只使用以一的一种安装方式来安装）:
+    新版本的 GNU Emacs 发行版已经包含了 Org 了，所以不需要再额外安装。安装的方式有（强烈建议坚持只使用以一的一种安装方式来安装）:
 
 **** 使用 Emacs 的 package s                                                                   | org-table-fedit-lisp-indent                         |
      | M-TAB                | Complete Lisp symbols, just like in Emacs Lisp mode                                                                                            | lisp-complete-symbol                                |
