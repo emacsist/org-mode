@@ -3,6 +3,7 @@
 #+DATE: <2017-03-02 Thu>
 #+EMAIL: emacsist@qq.com
 #+LANGUAGE: zh
+#+OPTIONS: toc:2
 #+TITLE: Org mode 手册学习笔记
 
 * 学习 org-mode
