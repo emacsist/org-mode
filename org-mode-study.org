@@ -1,0 +1,3020 @@
+* 学习 org-mode
+
+** 查看当前使用的 org-mode 版本
+   #+BEGIN_EXPORT ascii
+   M-x org-version
+   #+END_EXPORT
+
+
+** 插入一个 tab 字符
+   #+BEGIN_EXPORT ascii
+   C-q TAB
+   #+END_EXPORT
+
+
+** 查看变量的值
+   #+BEGIN_EXPORT ascii
+   C-h v your-var-name
+   #+END_EXPORT
+
+
+** 快速输入模板
+    以 *<* 开头，然后再以下面一个字母来表示想输入的模板，然后再按一下 TAB 即可。
+
+    #+BEGIN_EXPORT ascii
+    s	#+BEGIN_SRC ... #+END_SRC 
+    e	#+BEGIN_EXAMPLE ... #+END_EXAMPLE
+    q	#+BEGIN_QUOTE ... #+END_QUOTE 
+    v	#+BEGIN_VERSE ... #+END_VERSE 
+    c	#+BEGIN_CENTER ... #+END_CENTER 
+    l	#+BEGIN_LaTeX ... #+END_LaTeX 
+    L	#+LaTeX: 
+    h	#+BEGIN_HTML ... #+END_HTML 
+    H	#+HTML: 
+    a	#+BEGIN_ASCII ... #+END_ASCII 
+    A	#+ASCII: 
+    i	#+INDEX: line 
+    I	#+INCLUDE: line 
+    #+END_EXPORT
+
+
+** 在表格中进行计算
+   在表格的下面，添加
+   #+BEGIN_EXPORT ascii
+   #+TBLFM: $1=$2+$3::第二个表达式::第三个表达式
+   #+END_EXPORT
+   $1：表示第一列，以此类推。填写完表达式后，将光标移动到表达式所在的位置，然后按 *C-c C-c* ，这样子就会进行表达式计算并填充值到相应的单元中了。
+
+
+** 查看 emacs 版本
+   #+BEGIN_EXPORT ascii
+   M-x emacs-version RET
+   #+END_EXPORT
+
+
+** 将 Org 显示为显示以 UTF-8 的字符来显示。
+   比如在链接中，Org 会像 HTML 那个，将 description 显示，而隐藏了 link。如果这时想完整显示纯文本内容的话，就可以按如下按键：*C-c C-x \*
+
+   
+*  Org 手册
+
+** 第一章：介绍
+
+*** 安装 Org
+
+    最近的 GNU Emacs 发行版已经包含了 Org 了，所以不需要再额外安装。安装的方式有（强烈建议坚持只使用以一的一种安装方式来安装）:
+
+**** 使用 Emacs 的 package s                                                                   | org-table-fedit-lisp-indent                         |
+     | M-TAB                | Complete Lisp symbols, just like in Emacs Lisp mode                                                                                            | lisp-complete-symbol                                |
+     | S-up/down/left/right | Shift the reference at point                                                                                                                   | org-table-fedit-line-up / org-table-fedit-line-down |
+     | M-S-up / M-S-down    | Move the test line for column formulas in the Org bu er up and                                                                                 |                                                     |
+     | M-up / M-down        | Scroll the window displaying the tableystem
+     #+BEGIN_EXPORT ascii
+     M-x package-install RET abcdefghijklmnopqlksdfljksadflskdflsdjforg
+     #+END_EXPORT
+     
+     注意，你需要在一个没有打开过任何 *.org* 文件的会话中执行这个命令。
+
+
+**** 下载归档的 Org
+
+***** [[http://orgmode.org/][Org's Website]] 下载归档文件
+
+      下载完毕后，添加以下的配置到你的 Emacs init 文件中：
+      #+BEGIN_EXPORT ascii
+      (add-to-list 'load-path "~/path/to/orgdir/lisp")
+      #+END_EXPORT
+
+		  想使用 Org 的第三库，则可以在你的 init 配置文件中，也加入以下配置
+
+      #+BEGIN_EXPORT ascii
+      (add-to-list 'load-path "~/path/to/orgdir/contrib/lisp" t)
+      #+END_EXPORT
+
+		  你也可以编译这些文件，然后安装到你的系统中。请用 *make help* 来查看编译和安装的选项。
+
+
+**** 使用 Org 的 git 仓库
+     #+BEGIN_EXPORT ascii
+     $ cd ~/src/
+     $ git clone git://orgmode.org/org-mode.git
+     $ make autoloads
+     #+END_EXPORT
+
+		  注意，这里的 *make autoloads* 是强制的。执行完后，请记得按上面方法的描述，加入到正确的 *load-path* 中。同样也可以使用 *make help* 来查看编译和安装的选项。
+
+
+*** 激活 Org
+
+**** 4个 Org 命令应该通过全局的 key 来访问
+     #+BEGIN_EXPORT ascii
+     (global-set-key "\C-cl" 'org-store-link)
+     (global-set-key "\C-ca" 'org-agenda)
+     (global-set-key "\C-cc" 'org-capture)
+     (global-set-key "\C-cb" 'org-iswitchb)
+     #+END_EXPORT
+
+			按键请绑定为你自己的适合的。
+
+
+****  默认情况下 .org 文件自动会使用 Org mode
+
+
+**** 文件中第一行的内容类似如下的，也会使用 Org mode
+     #+BEGIN_EXPORT ascii
+     MY PROJECTS    -*- mode: org; -*-
+     #+END_EXPORT
+
+     可以查看变量 *org-insert-mode-line-in-empty-file* (C-h v org-insert-mode-line-in-empty-file) 的描述。默认是 nil 值。如果为非 nil，在会在空白文件的第一行，插入这指示使用 org-mode 的标志。开启后，之后就会在空白文件上使用 org-mode 时，它就会插入以下内容在第一行中:
+     #+BEGIN_EXPORT ascii
+     #    -*- mode: org -*-
+     #+END_EXPORT
+
+
+** 第二章：文档结构
+
+*** 大纲
+     Org 是 Outline mode 的顶层实现。Outline 允许以一种层级结构来组织文档。通过 *org-cycle* (通常已经绑定到了 *TAB* 键)命令来进行显示/隐藏 这些层级。
+
+
+*** 标题
+
+    标题，在左边以一个或多个星号开始的然后空至少一个空格输入标题。例如下面的例子
+
+    #+BEGIN_EXPORT ascii
+    * Top level headline
+
+    ** Second level
+
+    *** 3rd level
+		    some text
+
+    *** 3rd level
+    more text
+
+    
+    * Another top level headline
+    #+END_EXPORT
+
+		注意，在层级中最后一个空行，被视作为层级的一部分。（所以，如果你想要在 TAB 时看到空一行的话，实际要输入2个空行）
+
+
+*** 折叠
+**** 全局/局部折叠
+     *TAB* 和 *S-TAB*
+
+***** TAB(M-x org-cycle)
+      作用于当前顶层的子层级
+
+***** S-TAB 或者 C-u TAB (M-x org-global-cycle)
+      作用于整个 buffer
+
+***** C-u C-u TAB (M-x org-set-startup-visibility)
+      切换到启动时的 buffer 的可见性一样
+
+***** C-u C-u C-u TAB (M-x outline-show-all)
+      显示所有
+
+***** C-c C-r (M-x org-reveal)
+      
+***** C-c C-k (M-x outline-show-branches)
+      显示当前标题的所有子标题
+
+***** C-c TAB (M-x outline-show-children)
+       显示所有直接子标题
+
+***** C-c C-x b (M-x org-tree-to-indirect-buffer)
+      显示当前及所有子层级到一个新的 bufer 中去。
+
+***** C-c C-x v (M-x org-copy-visible)
+
+*** 初始可见性
+    当 emacs 第一次访问 Org 文件，全局状态是 OVERVIEW（概述），例如：只有顶层的标题是可见的。这个可以通过配置变量 *org-startup-folded* 或者在每个文件的基础上，加上以下内容中的一行来控制：
+    #+BEGIN_EXPORT ascii
+    #+STARTUP: overview
+    #+STARTUP: content
+    #+STARTUP: showall
+    #+STARTUP: showeverything
+    #+END_EXPORT
+
+		在任何一个入口中，设置一个 *VISIBILITY* 属性可以来控制它们的可见性。允许的值有：
+
+    * folded
+    * children
+    * content
+    * all
+    
+
+*** 移动
+    
+| shortcut  | desc                                                                     | command                      |
+|-----------+--------------------------------------------------------------------------+------------------------------|
+| C-c C-n   | Next heading                                                             | org-next-visible-heading     |
+| C-c C-p   | Previous heading                                                         | org-previous-visible-heading |
+| C-c C-f   | Next heading same level                                                  | org-forward-same-level       |
+| C-c C-b   | Previous heading same level                                              | org-backward-same-level      |
+| C-c C-u   | Backward to higher level heading                                         | outline-up-heading           |
+| C-c C-j   | Jump to a di erent place without changing the current outline visibility | org-goto                     |
+| TAB       | Cycle visibility                                                         |                              |
+| down / up | Next/previous visible headline                                           |                              |
+| RET       | Select this location                                                     |                              |
+| /         | Do a Sparse-tree search                                                  |                              |
+
+*** 结构编辑
+
+  | shortcut    | desc                                                                                                                               | command                                 |
+  |-------------+------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------|
+  | M-RET       | Insert a new heading/item with the same level as the one at point                                                                  | org-insert-heading                      |
+  | C-RET       | Insert a new heading at the end of the current subtree                                                                             | org-insert-heading-respect-content      |
+  | M-S-RET     | Insert new TODO entry with same level as current heading                                                                           | org-insert-todo-heading                 |
+  | C-S-RET     | Insert new TODO entry with same level as current heading. Like C-RET, the new headline will be inserted after the current subtree. | org-insert-todo-heading-respect-content |
+  | TAB         | In a new entry with no text yet, the  rst TAB demotes the entry to become a child of the previous one                              | org-cycle                               |
+  | M-left      | Promote current heading by one level                                                                                               | org-do-promote                          |
+  | M-right     | Demote current heading by one level                                                                                                | org-do-demote                           |
+  | M-S-left    | Promote the current subtree by one level.                                                                                          | org-promote-subtree                     |
+  | M-S-right   | Demote the current subtree by one level                                                                                            | org-demote-subtree                      |
+  | M-S-up      | Move subtree up (swap with previous subtree of same level)                                                                         | org-move-subtree-up                     |
+  | M-S-down    | Move subtree down (swap with next subtree of same level)                                                                           | org-move-subtree-down                   |
+  | M-h         | Mark the element at point                                                                                                          | org-mark-element                        |
+  | C-c @       | Mark the subtree at point                                                                                                          | org-mark-subtree                        |
+  | C-c C-x C-w | Kill subtree, i.e.                                                                                                                 | org-cut-subtree                         |
+  | C-c C-x M-w | Copy subtree to kill ring                                                                                                          | org-copy-subtree                        |
+  | C-c C-x C-y | Yank subtree from kill ring                                                                                                        | org-paste-subtree                       |
+  | C-y         | org-yank                                                                                                                           | org-yank                                |
+  | C-c C-x c   | Clone a subtree by making a number of sibling copies of it                                                                         | org-clone-subtree-with-time-shift       |
+  | C-c C-w     | Refile entry or region to a di erent location                                                                                      | org-refile                              |
+  | C-c ^       | Sort same-level entries                                                                                                            | org-sort                                |
+  | C-x n s     | Narrow buffer to current subtree                                                                                                   | org-narrow-to-subtree                   |
+  | C-x n b     | Narrow buffer to current block                                                                                                     | org-narrow-to-block                     |
+  | C-x n w     | Widen buffer to remove narrowing                                                                                                   | widen                                   |
+  | C-c *       | Turn a normal line or plain list item into a headline                                                                              | org-toggle-heading                      |
+
+
+*** Sparse trees 过滤显示的内容
+
+| shortcut           | desc                                                                   | command         |
+|--------------------+------------------------------------------------------------------------+-----------------|
+| C-c /              | This prompts for an extra key to select a sparse-tree creating command | org-sparse-tree |
+| C-c / r or C-c / / | Prompts for a regexp and shows a sparse tree with all matches.         | org-occur       |
+| M-g n or M-g M-n   | Jump to the next sparse tree match in this bu er                       | next-error      |
+| M-g p or M-g M-p   | Jump to the previous sparse tree match in this bu er                   | previous-error  |
+
+这个可以配合 agenda 来使用
+
+
+*** 列表
+    列表的层次是用缩进来表示的
+
+**** 无序
+     #+BEGIN_EXPORT ascii
+     - item1
+     + item2
+     * item3
+     #+END_EXPORT
+
+**** 有序
+     #+BEGIN_EXPORT ascii
+     1. item1
+     2) item2
+     #+END_EXPORT
+
+**** 列表的描述
+     在列表后面加上 * :: * 来添加描述（用于无序列表上）
+
+**** 列表的操作
+
+     | shortcut              | desc                                                                                                                                 | command            |
+     |-----------------------+--------------------------------------------------------------------------------------------------------------------------------------+--------------------|
+     | TAB                   | Items can be folded just like headline levels                                                                                        | org-cycle          |
+     | M-RET                 | Insert new item at current level                                                                                                     | org-insert-heading |
+     | M-S-RET               | Insert a new item with a checkbox                                                                                                    |                    |
+     | S-up / S-down         | Jump to the previous/next item in the current list                                                                                   |                    |
+     | M-up / M-down         | Move the item including subitems up/down                                                                                             |                    |
+     | M-left / M-right      | Decrease/increase the indentation of an item, leaving children alone                                                                 |                    |
+     | M-S-left /  M-S-right | Decrease/increase the indentation of the item, including subitems                                                                    |                    |
+     | C-c C-c               | If there is a checkbox in the item line, toggle the state of the checkbox                                                            |                    |
+     | C-c -                 | Cycle the entire list level through the di erent itemize/enumerate bullets (‘-’, ‘+’, ‘*’, ‘1.’, ‘1)’) or a subset of them |                    |
+     | C-c *                 | Turn a plain list item into a headline                                                                                               |                    |
+     | C-c C-*               | Turn the whole plain list into a subtree of the current heading                                                                      |                    |
+     | S-left/right          | This command also cycles bullet styles when the cursor in on the bullet or anywhere in an item line                                  |                    |
+     | C-c ^                 | Sort the plain list                                                                                                                  |                    |
+
+*** Drawers 抽屉
+    有时，你想保留一些与入口相关的信息，但你通常不想看到它。这时，就可以用 drawers。他们可以包含任何内容，除了标题和其他的抽屉（即不能嵌套抽屉）。drawers 类似如下：
+
+    #+BEGIN_EXPORT ascii
+    
+    ** This is a headline
+        Still outside the drawer
+        :DRAWERNAME:
+        This is inside the drawer.
+        :END:
+        After the drawer.
+
+    #+END_EXPORT
+
+     可以在当前光标下插入 drawer，(M-x org-insert-drawer，绑定到了 C-c C-x d)。当激活一个区域时，这个命令会将这些区域包含在 drawer 里面。
+
+**** C-c C-z 
+     添加一个时间戳的标注到 LOGBOOK 抽屉，类似如下：
+
+     #+BEGIN_EXPORT ascii
+     - Note taken on [2017-02-25 Sat 13:24]
+     #+END_EXPORT
+
+*** 块
+     Org 使用 *begin...end* 块来达到各种不同的目的。可以通过 TAB 来折叠或显示这些。类似如下：
+     
+     #+BEGIN_EXPORT ascii
+     #+STARTUP: hideblocks
+     #+STARTUP: nohideblocks
+     #+END_EXPORT
+
+*** 脚注
+    1. 例子1
+	    #+BEGIN_EXPORT ascii
+	    The Org homepage[fn:1] now looks a lot better than it used to.
+	     ...
+	    [fn:1] The link is: http://orgmode.org
+  	  #+END_EXPORT
+    2. 例子2
+       #+BEGIN_EXPORT ascii
+       [fn:name]
+       #+END_EXPORT
+    3. 例子3
+       #+BEGIN_EXPORT ascii
+       [fn::This is the inline definition of this footnote]
+       #+END_EXPORT
+    4. 例子4
+       #+BEGIN_EXPORT ascii
+       [fn:name:a definition]
+       #+END_EXPORT
+
+**** 操作
+     * 插入脚注： C-c C-x f
+     * 脚注和引用之间相互跳转： C-c C-c
+     * 进入脚注的连接：C-c C-o
+     * 编辑当前光标所在的脚注：C-c '
+
+*** Orgstruct minor 模式
+    如果你想在其他的主模式中（如 Message mode） 也想使用 Orgmode 的结构来编辑，那么就可以使用 *orgstruct-mode* 来进行辅助编辑。（M-x orgstruct-mode RET）。如果想在 Message mode 下自动打开，则可以加入以下配置到 init 文件的中：
+    #+BEGIN_SRC elisp
+    (add-hook 'message-mode-hook 'turn-on-orgstruct)
+    (add-hook 'message-mode-hook 'turn-on-orgstruct++)
+    #+END_SRC
+
+
+** 第三章：表格
+
+*** 内置表格编辑器
+    任何以 *|* 作为第一个非空的字符的，都视作表格的一部分。*|* 也是列的分隔符。一个表格看上去类似这样子：
+
+    | Name  | Phone | Age |
+    |-------+-------+-----|
+    | Peter |  1234 |  17 |
+    | Anna  |  4321 |  25 |
+
+    表格会在你每次在表格内按 *TAB* 或者 *RET* 或者 *C-c C-c*时会自动重排。
+
+    * TAB：移动到下一字段
+    * RET：移动到下一行
+
+
+    任何以 *|-* 开头的行，都被视作是水平分隔线，它会在下次自动重排时填充整个表格的宽度。所以，创建一个上面的表格，你只需要输入：
+
+    #+BEGIN_EXPORT ascii
+    |Name | Phone | Age|
+    |-
+    #+END_EXPORT
+
+    然后再按下 *TAB* 即可。更快的输入可以是，先输入 
+
+    #+BEGIN_EXPORT ascii
+    |Name | Phone | Age
+    #+END_EXPORT
+
+    然后再输入 *C-c RET* 
+
+**** 创建和转换表格
+     | shortcut  | desc                                                                         | command                                 |
+     |-----------+------------------------------------------------------------------------------+-----------------------------------------|
+     | C-c \vert | Convert the active region to a table                                         | org-table-create-or-convert-from-region |
+
+     转换表格时，如果每行至少包含一个 TAB，则以 TAB 为分隔。否则如果有逗号，则以逗号分隔，也没有的话，就以空格来分隔。你也可通过以下命令来强制指定
+     #+BEGIN_EXPORT ascii
+     C-u forces CSV, C-u C-u forces TAB, C-u C-u C-u will prompt for a regular expression to match the separator, and a numeric argument N indicates that at least N consecutive spaces, or alternatively a TAB will be the separator
+     #+END_EXPORT
+
+**** 重排和字段操作
+     | shortcut | desc                                                                         | command                      |
+     |----------+------------------------------------------------------------------------------+------------------------------|
+     | C-c C-c  | Re-align the table and don’t move to another field                          | org-table-align              |
+     | C-c SPC  | Blank the  eld at point                                                      | org-table-blank-field        |
+     | TAB      | Re-align the table, move to the next  eld. Creates a new row if necessary.   | org-table-next-field         |
+     | S-TAB    | Re-align, move to previous  field.                                           | org-table-previous-field     |
+     | RET      | Re-align the table and move down to next row. Creates a new row if necessary | org-table-next-row           |
+     | M-a      | Move to beginning of the current table  eld, or on to the previous  eld.     | org-table-beginning-of-field |
+     | M-e      | Move to end of the current table  eld, or on to the next  field              | org-table-end-of-field       |
+     |          |                                                                              |                              |
+     
+**** 列和行编辑
+     | shortcut         | desc                                                                                          | command                                                   |
+     |------------------+-----------------------------------------------------------------------------------------------+-----------------------------------------------------------|
+     | M-left / M-right | Move the current column left/right                                                            | org-table-move-column-left /  org-table-move-column-right |
+     | M-S-left         | Kill the current column                                                                       | org-table-delete-column                                   |
+     | M-S-right        | Insert a new column to the left of the cursor position                                        | org-table-insert-column                                   |
+     | M-up / M-down    | Move the current row up/down                                                                  | org-table-move-row-up / org-table-move-row-down           |
+     | M-S-up           | Kill the current row or horizontal line.                                                      | org-table-kill-row                                        |
+     | M-S-down         | Insert a new row above the current row.                                                       | org-table-insert-row                                      |
+     | C-c -            | Insert a horizontal line below current row                                                    | org-table-insert-hline                                    |
+     | C-c RET          | Insert a horizontal line below current row, and move the cursor into the row below that line. | org-table-hline-and-move                                  |
+     | C-c ^            | Sort the table lines in the region                                                            | org-table-sort-lines                                      |
+
+**** 区域
+     | shortcut    | desc                                                                                                | command                   |
+     |-------------+-----------------------------------------------------------------------------------------------------+---------------------------|
+     | C-c C-x M-w | Copy a rectangular region from a table to a special clipboard.                                      | org-table-copy-region     |
+     | C-c C-x C-w | Copy a rectangular region from a table to a special clipboard, and blank all  elds in the rectangle | org-table-cut-region      |
+     | C-c C-x C-y | Paste a rectangular region into a table.                                                            | org-table-paste-rectangle |
+     | M-RET       | Split the current  eld at the cursor position and move the rest to the line below                   | org-table-wrap-region     |
+
+**** 计算
+     | shortcut | desc                                                                                                                                                     | command             |
+     |----------+----------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------|
+     | C-c +    | Sum the numbers in the current column, or in the rectangle de ned by the active region.The result is shown in the echo area and can be inserted with C-y | org-table-sum       |
+     | S-RET    | When current  eld is empty, copy from  rst non-empty  eld above                                                                                          | org-table-copy-down |
+
+**** 混合
+     | shortcut                 | desc                                                                                            | command              |
+     |--------------------------+-------------------------------------------------------------------------------------------------+----------------------|
+     | C-c `                    | Edit the current  eld in a separate window ,This is useful for  elds that are not fully visible | org-table-edit-field |
+     | M-x org-table-import RET | Import a  le as a table.                                                                        |                      |
+     | M-x org-table-export RET | Export the table, by default as a TAB-separated  file                                           |                      |
+
+
+**** 表格中输入特殊字符
+     * 输入 *|* 字符
+       #+BEGIN_EXPORT ascii
+       If \vert is not automatically converted to |, call org-toggle-pretty-entities
+
+       To insert a vertical bar into a table  eld, use \vert or, inside a word abc\vert{}def.
+       #+END_EXPORT
+       
+
+*** 列宽度和对齐
+    控制列的宽度，可以在一列的任意一个单元里，该单元的内容为 *<N>* N 是整数，表示该列的字符数。下次重排时就会生效。例如：
+    | name | value                                   |
+    |------+-----------------------------------------|
+    | key  | abcdefghijklmnopqlksdfljksadflskdflsdjf |
+    
+    如果 value 列，有一个单元，它的内容为 *<6>* ，如下：就会这样子显示了。
+    | name | value  |
+    |------+--------|
+    | key  | <6>    |
+    | key  | abcdefghijklmnopqlksdfljksadflskdflsdjf |
+    | key  | slkdfjlasdfjlsadflsfjlasjl |
+
+    
+    对齐，可以使用 *<r>*, *<c>*, *<l>*，也可以组合，比如 *<r10>*
+
+
+*** 列组（Column groups）
+    当导出表格时，默认情况下是没有垂直线的。
+    你可以使用一个特别的行，这个行的第一个单元仅包含 */* 。该行的其他单元，包含 *<* 或者 *>* 或者 *<>* （该列自身为一组）。每一组是以 *<* 所在的列为开始， *>* 所在的列为结束。例如：
+
+    | N | N^2 | N^3 | N^4 | ~sqrt(n)~ | ~sqrt[4](N)~ |
+    |---+-----+-----+-----+-----------+--------------|
+    | / |   < |     |   > |         < |            > |
+    | 1 |   1 |   1 |   1 |         1 |            1 |
+    | 2 |   4 |   8 |  16 | 1.4142136 |    1.1892071 |
+    | 3 |   9 |  27 |  81 | 1.7320508 |    1.3160740 |
+    #+TBLFM: $2=$1^2::$3=$1^3::$4=$1^4::$5=sqrt($1)::$6=sqrt(sqrt(($1)))
+
+
+*** Orgtbl minor mode
+     如果你想在其他的主模式中使用 org table，你可以激活这个 minor mode: *M-x orgtbl-mode RET* 。例如想在启动时默认在 Message mode 中使用，则可以在 init 文件中加入以下配置：
+
+     #+BEGIN_EXPORT ascii
+     (add-hook 'message-mode-hook 'turn-on-orgtbl)
+     #+END_EXPORT
+
+
+*** 电子表格
+**** 引用
+***** 单元引用(field references)
+      可以像其他电子表格程序一样引用单元，例如：*B3* 表示第三行的第二个单元。然而 Org 中更常用的格式为： *@row$column*
+
+      column 可以是绝对值，例如: *$1*, *$2*, *$3*...*$N*
+      也可以是相对于当前 column 的相对值，例如：*$+1* 或者 *$-2*.
+      *$<* ：表示第一列
+      *$>* ：表示最后一列
+      *$0* ：表示当前列
+
+      row 可以是绝对值，例如：*@1*, *@2*, *@3*...*@4*
+      也可以是相对于当前 row 的相对值，例如：*@+3* 或者 *@-1*.
+      *@<* ：表示第一行
+      *@>* ：表示最后一行
+      *@0* ：表示当前行
+
+      水平线引用
+      *@I* ：表示第一条水平线
+      *@II* ：表示第二条水平线
+      *@-I* ：表示在当前水平线的上一条水平线
+      *@+I* ：表示在当前水平线的下面一条水平线
+      *@III+2* ：第三条水平线的第二个数据
+
+      例子及说明：
+      * @2$3 :: 表示第二行，第三列（与 C2 相同）
+      * $5 :: 当前行的第5列 （与 E& 相同）
+      * @2 :: 当前列，第2行
+      * @-1$-3 :: 上一行的，离当前列左边第三列
+      * @-I$2 :: 当前行上面的水平线，第二列
+      * @>$5 :: 最后一行的第5列
+
+***** 范围引用
+      通过二者之间的两个句点来表示范围 *..*. 假设都是在当前行，那么 *$2..$7* 表示第2列到第7列。如果二者是在不同的行，那么就必须使用 *@row$column* 的形式。例如：
+
+      * $1..$3 :: 表示当前行的第1列到第3列（即前3列）
+      * $P..$Q :: 使用列名表示范围
+      * $<<<..$>> :: 从第三列开始到倒数第二列
+      * @2$1..@4$3 :: 表示第二行的第一列到第四行的第三列（与 A2..C4 一样）
+
+
+      范围引用返回的是向量值，可以作为 Calc 向量函数的参数。
+
+***** 公式中的单元坐标
+      *@#* 和 *$#* 表示在 Calc 和 Lisp 公式中的行和列。例如：
+
+      * if(@# % 2, $#, string("")) :: 表示在偶数行中，将单元值清空
+      * $2 = '(identify remote(FOO, @@#$1)) :: 在名为 FOO 的表格中，将每一行的第一列的文本值复制到当前表格的第二列中。
+
+***** 命名引用
+      *$name* 解析为列名，参数或者常量。全局常量是通过 *org-table-formula-constants* 定义的。局部常量是通过类似以下的行来定义的：
+     
+      #+BEGIN_EXPORT ascii
+      #+CONSTANTS: c=299792458. pi=3.14 eps=2.4e-6
+      #+END_EXPORT
+
+
+      属性也可以作为公式中的常量。对于属性 *:Xyz:* ,它的引用为 *$PROP_Xyz* 
+      所有的命名，都必须是字母开头，后面接着可以是字母或数字
+
+***** 远程引用
+      你也可以从不同的表格中，引用常量，单元或范围，不管是当前所在的文件，还是其他不同的文件都可以。语法为：
+
+      *remote(NAME-OR-ID, REF)*
+
+      *NAME* 可以是当前文件中的表格名，它通过设置 *#+NAME:Name* 在表格的前一行中即可。也可以是入口的 ID，甚至是在不同的文件。
+      *REF* 是一个绝对单元或者范围引用（像上面介绍的那样）
+
+
+**** Calc 的公式语法
+     注意，calc 中，=/= 是比 =*= 拥有更低的优先级的。所以 =a/b*c= 会被解析为 =a/(b*c)= 。默认情况下，calc 使用标准的模式来进行计算。（精度：12，角的单位是度 ，不显示分数）。可以改变显示格式。*(float 8)* 来保持表格稳定。
+     可以通过 *org-calc-default-modes* 来改变这些默认的行为。下面是一些例子：
+
+     * $1+$2
+     * $1+$2;%.2f
+     * exp($2)+exp($1)
+     * $0;%.1f
+
+
+**** emacs 的 lisp 公式
+     它是以撇号紧接着开括号开头，然后是 lisp 的表达式。类似： *'(+ $1 $2);N* 
+
+
+**** 持续时间和时间值
+     如果想计算时间值，可以使用 *T* 标记。无论是在 calc 还是 elisp 公式中都可以。例如：
+     |  Task 1 |   Task 2 |   Task 3 |
+     |---------+----------+----------|
+     |    2:12 |     1:47 | 03:59:00 |
+     | 3:02:20 | -2:07:00 |     0.92 |
+     #+TBLFM: @2$3=$1+$2;T::@3$3=$1+$2;t
+
+     持续时间的值必须是形如： *HH:MM:[:SS]*，秒是可选的。当使用 
+     *T* 标记时，持续时间将会显示为： *HH:MM:SS*（上面的第一个公式）
+     *t* 标记时，这个值的显示，取决于 *org-table-duration-custom-format* 参数的值。默认情况下是 *'hours*，所以，将会显示的是多少小时。（上面的第二个公式）
+     
+     负数的持续时间也是可以计算的。一个普通的整型值，将被视作是秒数。
+
+
+**** 单元和范围公式
+     将一条公式赋值到一个单元中，可以直接在单元中输入赋值： *:=* ，例如： *:=vsum(@II..III)* 当你按下 TAB 或 RET 或 C-c C-c 时，就会应用这些公式并将结果保存到相应的单元中了。
+     公式可以存在在一个以 *#+TBLFM:* 开头，在表格的下面的特别行中。
+
+
+**** 列公式
+     类似: *$3=* 这将会将该列的所有单元都应用该公式。不过以下的情况的列除外：
+
+     * 如果表格包含水平分隔线的话，所以这些水平线的上面的第一行被视作是表格头的一部分。
+     * 如果该单元已经从单元或者范围公式中计算了值，那么，就会放弃使用列公式。
+
+
+     赋值一条列公式，可以在该列的任意一个单元中，输入类似 *=$1+$2* 这形式，然后按 *TAB* 或 *RET* 或 在该单元上按 *C-c C-c* 即可。
+     如果单元仅有 *=* ，则之前保存的公式将会被使用。对于每一行，Org 将仅记得最近使用的公式。在 *#+TBLFM:* 行中，列公式看起来类似这样子： *$4=$1+$2*
+     
+
+****  查找函数(Lookup functions)
+     太高级，忽略
+
+
+**** 编辑和调试公式
+     | shortcut             | desc                                                                                                                                           | command                                                 |
+     |----------------------+------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------|
+     | C-c = or C-u C-c =   | Edit the formula associated with the current column/ eld in the minibu er.                                                                     | org-table-eval-formula                                  |
+     | C-u C-u C-c =        | Re-insert the active formula (either a  eld formula, or a column formula) into the current  eld, so that you can edit it directly in the  eld. | org-table-eval-formula                                  |
+     | C-c ?                | While editing a formula in a table  eld, highlight the  eld(s) referenced by the reference at the cursor position in the formula.              | org-table-field-info                                    |
+     | C-c }                | Toggle the display of row and column numbers for a table, using overlays                                                                       | org-table-toggle-coordinate-overlays                    |
+     | C-c {                | Toggle the formula debugger on and o                                                                                                           | org-table-toggle-formula- debugger                      |
+     | C-c '                | Edit all formulas for the current table in a special bu er, where the formulas will be displayed one per line.                                 | org-table-edit-formulas                                 |
+     | C-c C-c or C-x C-s   | Exit the formula editor and store the modi ed formulas.                                                                                        | org-table-fedit-finish                                  |
+     | C-c C-q              | Exit the formula editor without installing changes.                                                                                            | org-table-fedit-abort                                   |
+     | C-c C-r              | Toggle all references in the formula editor between standard (like B3) and internal                                                            | org-table-fedit-toggle-ref-type                         |
+     | TAB                  | Pretty-print or indent Lisp formula at point                                                                                                   | org-table-fedit-lisp-indent                             |
+     | M-TAB                | Complete Lisp symbols, just like in Emacs Lisp mode                                                                                            | lisp-complete-symbol                                    |
+     | S-up/down/left/right | Shift the reference at point                                                                                                                   | org-table-fedit-line-up / org-table-fedit-line-down     |
+     | M-S-up / M-S-down    | Move the test line for column formulas in the Org bu er up and                                                                                 |                                                         |
+     | M-up / M-down        | Scroll the window displaying the table                                                                                                         | org-table-fedit-scroll-down / org-table-fedit-scroll-up |
+     | C-c }                | Turn the coordinate grid in the table on and off                                                                                               |                                                         |
+
+     使用多个 *#+TBLFM:* 行.类似如下：
+     
+		 #+BEGIN_EXPORT ascii
+     #+TBLFM: $2=$1*1 
+     #+TBLFM: $2=$1*2
+     #+END_EXPORT
+
+     不过要注意的是，每次应用一行的公式时，都会刷新单元的值。
+
+***** 调试公式
+      当计算导致错误时，单元的值会显示为 *#ERROR* ，这时，你可能想看变量的值和计算的顺序来查找 bug. 
+      在 *Tbl* 菜单中可以打开公式调式，然后重新计算，例如在单元中按下 *C-u C-u C-c = RET* ，这时就会显示详细的信息了。
+
+
+**** 高级功能
+     要想开启高级功能，你需要保留表格的第一列作为特殊的标记字符列。 *C-#* (M-x org-table-rotate-recalc-marks) ，例如下面的表格:
+
+     |   | Student | Prob 1 | Prob 2 | Prob 3 | Total | Note |
+     |---+---------+--------+--------+--------+-------+------|
+     | ! |         |     P1 |     P2 |     P3 |   Tot |      |
+     | # | Maximum |     10 |     15 |     25 |    50 | 10.0 |
+     | ^ |         |     m1 |     m2 |     m3 |    mt |      |
+     |---+---------+--------+--------+--------+-------+------|
+     | # | Peter   |     10 |      8 |     23 |    41 |  8.2 |
+     | # | Sam     |      2 |      4 |      3 |     9 |  1.8 |
+     |---+---------+--------+--------+--------+-------+------|
+     |   | Average |        |        |        |  25.0 |      |
+     | ^ |         |        |        |        |    at |      |
+     | $ | max=50  |        |        |        |       |      |
+     |---+---------+--------+--------+--------+-------+------|
+     #+TBLFM: $6=vsum($P1..$P3)::$7=10*$Tot/$max;%.1f::$at=vmean(@-II..@-I);%.1f
+
+     注意，使用 =C-u C-c *= 重新计算表格时，它只会对那些行标记为 '#' 或 '*' 的行，并且单元有一条赋值给它的公式。列公式并不会应用到那些第一个单元是空的行。那些标记字符的含义如下：
+     
+     '!' ： 在这一行的单元，表示定义这些列的名字，因此，你可以通过 *$Tot* 来代替 *$6* 引用列。
+     
+     '^' ： 为上面的行定义单元的名字。通过这样定义，任何表格的公式可以使用 *$m1* 来引用值 *10* ，你也可以赋一条公式给一个命名的单元，例如：*$name=....*
+     
+     '_' ： 类似'^'，不过是为下面的行定义单元的名字。
+
+     '$' ： 这一行的单元，可以为公式定义参数。上面的例子中，在一个 '$' 行包含了一个 *max=50* 的单元，因此，在表格公式中，可以通过 *$max* 来引用这个 *50* 的值。
+
+     '#' ： 这一行的单元可以为自动计算（TAB, RET 或者 S-TAB） 或全局重新计算时进行计算的。取消标记的话，则不会进行计算。
+
+     '*' ： 这一行将在进行全局重新计算(C-u C-c *)时进行计算，但不会为自动计算时进行计算。
+
+     ''  ： 排除计算的行
+     
+     '/' ： 这种一般用在那些包含 '<N>' 的行或列组中。
+
+
+
+*** Org-Plot
+     它可以生成一些图形化的信息保存在表格中，不管是图形的还是 ASCII 形式的都可以。
+     它使用 [[http://www.gnuplot.info/][Gnuplot]] 和 gnuplot-mode [[http://xafs.org/BruceRavel/GnuplotMode][http://xafs.org/BruceRavel/GnuplotMode]] 。
+     为了看到这些动作，请确保你已经安装了 Gnuplot 和 Gnuplot mode 已经安装到你的系统中，然后在下面的表格中调用 *C-c " g* 或者 *M-x org-plot/gnuplot RET* 
+
+     Mac 上安装 ： *brew install gnuplot*
+
+     #+PLOT: title:"Citas" ind:1 deps:(3) type:2d with:histograms set:"yrange [0:]"
+     | Sede      | Max cites | H-index |
+     |-----------+-----------+---------|
+     | Chile     |    257.72 |   21.39 |
+     | Leeds     |    165.77 |   19.68 |
+     | Sao Paolo |        71 |   11.50 |
+     | Stockholm |    134.19 |   14.33 |
+     | Morelia   |    257.56 |   17.67 |
+
+     注：好像我在自己的 Mac 上调用，没有见有什么效果。*_*
+
+****  ASCII 的 plots
+      当光标在某一列时，输入 *C-c " a* 或者 *M-x orgtbl-ascii-plot RET* 将会产生一个新的包含 ASCII 码的条形列。 例如：
+
+     | Sede      | Max cites |              |
+     |-----------+-----------+--------------|
+     | Chile     |    257.72 | WWWWWWWWWWWW |
+     | Leeds     |    165.77 | WWWWWWWh     |
+     | Sao Paolo |     71.00 | WWW;         |
+     | Stockholm |    134.19 | WWWWWW:      |
+     | Morelia   |    257.56 | WWWWWWWWWWWW |
+     | Ro        |      0.00 |              |
+     #+TBLFM: $3='(orgtbl-ascii-draw $2 0.0 257.72 12)
+
+     公式为 *(orgtbl-ascii-draw COLUMN MIN MAX WIDTH)*
+
+
+** 第四章：超链接
+*** 链接格式
+    #+BEGIN_EXPORT ascii
+    [[link][description]] 或者也可以： [[link]]
+    #+END_EXPORT
+
+    一旦完成后，Org 会将它显示为 'description' 来代替 '[[link][description]]' ， 显示 'link' 来代替 '[[link]]' . 你可以在 link 上，使用 *C-c C-l* 来编辑相应的不可见的 link 部分。
+
+
+*** 内部链接
+    如果一个链接看起来不像是一个 URL，那么它就被视作是当前文件的内部链接。最重要的链接例子类似： '[[#my-custom-id]]' ，这个将链接到一个带有属性 *CUSTOM_ID* 为 'my-custom-id' 的入口。你自己要确保这些 ID 在当前文件是唯一的。
+    类似 '[[My Target]]' 或者 '[[My Target][Find my target]]' 这会导致在当前文件中进行文本搜索。
+    可以在当前链接中，使用 *C-c C-o* 或者使用鼠标点击链接来进入该链接所在的地方。
+
+*** radio 链接
+    比如一个 target 为 '<<<My Target>>>' 会导致在文本中每一个出现 'my target' 的文本变成一个激活的链接。当你在一个 radio 链接上时，通过 *C-c C-c* ，你可以更新这些链接。
+
+*** 外部链接
+    * http://www.astro.uva.nl/~dominik
+    * /home/dominik/images/jupiter.jpg
+    * file:/home/dominik/images/jupiter.jpg
+    * file:/myself@some.where:papers/last.pdf
+    * file:sometextfile::NNN ::  file, jump to line number
+    * file:projects.org::somewords :: text search in Org file
+    
+
+*** 处理链接
+    | shortcut                  | desc                                                                                                                                                 | command                           |
+    |---------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------|
+    | C-c l                     | Store a link to the current location                                                                                                                 | org-store-link                    |
+    | C-c C-l                   | Insert a link                                                                                                                                        | org-insert-link                   |
+    | C-u C-c C-l               | When C-c C-l is called with a C-u pre x argument, a link to a  le will be inserted and you may use  le name completion to select the name of the  le |                                   |
+    | C-c C-l                   | with cursor on existing link. allows you to edit the link and description parts of the link.                                                         |                                   |
+    | C-c C-o                   | Open link at point                                                                                                                                   | org-open-at-point                 |
+    | RET                       | When org-return-follows-link is set, RET will also follow the link at point                                                                          |                                   |
+    | mouse-2 / mouse-1         | On links, mouse-1 and mouse-2 will open the link just as C-c C-o would                                                                               |                                   |
+    | mouse-3                   | Like mouse-2, but force  le links to be opened with Emacs, and internal links to be displayed in another window                                      |                                   |
+    | C-c C-x C-v               | Toggle the inline display of linked images                                                                                                           | org-toggle-inline-images          |
+    | C-c %                     | Push the current position onto the mark ring, to be able to return easily                                                                            | org-mark-ring-push                |
+    | C-c &                     | Jump back to a recorded position                                                                                                                     | org-mark-ring-goto                |
+    | C-c C-x C-n / C-c C-x C-p | Move forward/backward to the next link in the buffer                                                                                                 | org-next-link / org-previous-link |
+
+
+***  使用外部的 Org 链接
+    M-x org-insert-link-global
+    M-x org-open-at-point-global
+
+
+*** 链接缩写
+    一个缩写的链接看起来类似这样子：
+
+    #+BEGIN_EXAMPLE
+    [[linkword:tag][description]]
+    #+END_EXAMPLE
+
+    tag 是可选的。*linkword* 必须是字母开头，后面接着可以是字母或数字或'-'或'_' 。链接的缩写是通过变量 *org-link-abbrev-alist* 来解析的。这时有个例子：
+    
+    #+BEGIN_EXAMPLE
+    (setq org-link-abbrev-alist
+        '(("bugzilla"  . "http://10.1.2.9/bugzilla/show_bug.cgi?id=")
+          ("url-to-ja" . "http://translate.google.fr/translate?sl=en&tl=ja&u=%h")
+          ("google"    . "http://www.google.com/search?q=")
+          ("gmap"      . "http://maps.google.com/maps?q=%s")
+          ("omap"      . "http://nominatim.openstreetmap.org/search?q=%s&polygon=1")
+          ("ads"       . "http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?author=%s&db_key=AST")))
+    #+END_EXAMPLE
+
+    上面那些含有 *%s* 的文本将会被上面的 *tag* 替换。
+    可以使用 *%h* 来表示是 URL-encode 后的 *tag* 。
+    使用 *%(my-function)* 会将 *tag* 作为自定义函数的参数传递给该函数，然后被返回的结果替换。
+
+    有了上面的缩写表，你就可以使用类似如下的链接了： [[bugzilla:129]] 
+    
+    如果你仅需要为一个 Org buffer 来定义这些链接的缩写，你可以在文件中通过下面的语法来定义它们：
+    
+    #+BEGIN_EXAMPLE
+    #+LINK: bugzilla  http://10.1.2.9/bugzilla/show_bug.cgi?id=
+    #+LINK: google    http://www.google.com/search?q=%s
+    #+END_EXAMPLE
+
+    
+*** 在文件链接中的搜索选项
+    #+BEGIN_EXAMPLE
+    [[file:~/code/main.c::255]]
+    [[file:~/xx.org::My Target]]
+    [[file:~/xx.org::*My Target]]
+    [[file:~/xx.org::#my-custom-id]]
+    [[file:~/xx.org::/regexp/]]
+    #+END_EXAMPLE
+
+    * 255 :: 表示跳转到第255行
+    * My Target :: 搜索一个链接目标为 '<<My Target>>' 的链接 ，或者搜索 'my target' 的文本，类似在内部链接中的搜索。
+    * *My Target ::  在一个 Org 文件中，严格搜索标题
+    * #my-custom-id :: 链接到一个带有 *CUSTOM_ID* 属性的入口中
+    * /regexp/ :: 进行正则搜索。
+
+
+*** 自定义搜索
+    你可以通过编写自定义函数来进行自定义搜索。参考勾子变量： *org-create-file-search-functions* 和 *org-execute-file-search-functions* 
+
+
+** 第五章：TODO 项
+*** 基本的 TODO 功能
+    任何以 *TODO* 开头的标题都会成为一个 TODO 项，例如:
+    #+BEGIN_EXAMPLE
+    *** TODO Write letter to Sam Fortune
+    #+END_EXAMPLE
+
+    结合 TODO 项工作的最重要的命令是: 
+
+    * *C-c C-t* (M-x org-todo).  它会循环 TODO 的状态：
+
+          #+BEGIN_EXAMPLE
+          ,-> (unmarked) -> TODO -> DONE --.
+          '--------------------------------'
+					#+END_EXAMPLE
+
+    * *C-u C-c C-t*
+       选择 TODO 项的状态。
+
+    * *S-right / S-left*
+      循环 TODO 的状态
+
+    * *C-c / t* (M-x org-show-todo-tree)
+      在 sparse tree 中查看 TODO 项
+
+    * *C-c a t* (M-x org-todo-list)
+      显示全部的 TODO 列表。收集这些从所有 agenda 文件中的 TODO 列表
+
+    * *S-M-RET* (M-x org-insert-todo-heading)
+      在当前的 TODO 下面插入一个新的 TODO 项
+
+
+*** 扩展的 TODO 用法
+    默认情况下，TODO 项只有两种状态： *TODO* 和 *DONE* 
+    Org mode 允许你以更复杂的方式来使用 TODO 关键字进行分类(保存在变量 *org-todo-keywords* 中).
+    特别注意，标签(tags)是另一种分类的方式。
+
+**** 作为工作流状态的 TODO 关键字
+     例如:
+     #+BEGIN_EXAMPLE
+     (setq org-todo-keywords
+       '((sequence "TODO" "FEEDBACK" "VERIFY" "|" "DONE" "DELEGATED")))
+     #+END_EXAMPLE
+     
+     上面的垂直线从 *DONE* 状态（即不需要更多操作）分隔 *TODO* 关键字。
+     如果你不提供这个垂直分隔线，那最后一个状态就是 *DONE*
+
+     通过上面的设置，命令 *C-c C-t* 将从 *TODO* 状态到 *FEEDBACK*，然后再到 *VERIFY*，最后到 *DONE* 和 *DELEGATED* .
+     你也可以使用一个数字前缀来直接选择哪个状态，例如： *C-3 C-c C-t* 将直接变成 *VERIFY* 状态。
+     或者你使用 *S-left* 来返回到上一个状态。
+
+
+**** 作为类型的 TODO 关键字
+     你也可以将 TODO 关键字作为一系列动作的类型。
+     例如，你可能想指示哪些项是作为 *work* 或者 *home* 类型的。或者，当你与其他人在同一个项目中工作时，你可能想将相应的动作指派到相应的人。这时，可以使用它们的名字作为 TODO 关键字。类似如下的设置：
+
+     #+BEGIN_EXAMPLE
+     (setq org-todo-keywords '((type "Fred" "Sara" "Lucy" "|" "DONE")))
+     #+END_EXAMPLE
+
+     在这种情况下，不同的关键字就不是指顺序了，而是指不同的类型。
+     可以通过输入 *C-3 C-c / t* 来查看所有与 *Lucy*（因为上面 Lucy 是第三个） 相关的 TODO 项。
+     你也可以通过 *C-3 C-c a t* 来收集所有 agenda 中与 Lucy 相关的 TODO 项。
+
+
+**** 在一个文件中使用多个关键字
+     有时，你可能想并行地使用不同的 TODO 关键字集合。例如，你可能想使用基础的 *TODO/DONE* ，但也想使用工作流作为修复 bug，并且有一系列的状态，指示哪些项已经被取消了。那你的设置可能看起来是像下面这样子：
+
+     #+BEGIN_EXAMPLE
+     (setq org-todo-keywords
+           '((sequence "TODO" "|" "DONE")
+             (sequence "REPORT" "BUG" "KNOWNCAUSE" "|" "FIXED")
+             (sequence "|" "CANCELED")))
+     #+END_EXAMPLE
+
+     下面的命令，将从一个 TODO 关键字集合中，跳到下一个关键字的集合：
+     * C-u C-u C-c C-t
+     * C-S-right
+     * C-S-left
+
+     下面的命令，那循环所有集合中的所有 TODO 关键字。
+     * S-right
+     * S-left
+
+
+**** 快速访问 TODO 状态
+     你可以通过在关键字后面加上一个 *(single-letter)* 来快速访问这些状态。例如下面的设置:
+
+     #+BEGIN_EXAMPLE
+     (setq org-todo-keywords
+           '((sequence "TODO(t)" "|" "DONE(d)")
+             (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
+             (sequence "|" "CANCELED(c)")))
+     #+END_EXAMPLE
+
+     当你按下 *C-c C-t* 时，就可以按上面中的代表字母来达到快速访问指定状态了。
+
+**** 为每个独立的文件设置关键字
+     你可以在你的文件中的任意位置加上下面的行来达到这目的：
+     
+     #+BEGIN_EXAMPLE
+     #+TODO: TODO FEEDBACK VERIFY | DONE CANCELED
+     #+END_EXAMPLE
+     
+     默认情况下, *#+TODO* 与 *#+SEQ_TODO* 一样。添加的是类型时：
+
+     #+BEGIN_EXAMPLE
+     #+TYP_TODO: Fred Sara Lucy Mike | DONE
+     #+END_EXAMPLE
+     
+
+     并行使用几个集合时：
+
+     #+BEGIN_EXAMPLE
+     #+TODO: TODO | DONE
+     #+TODO: REPORT BUG KNOWNCAUSE | FIXED
+     #+TODO: | CANCELED
+     #+END_EXAMPLE
+
+
+**** 为 TODO 关键字添加不同的样式(faces)
+     Org mode 通过变量 (*org-todo*) 会高亮 TODO 关键字，通过变量 (*org-done*) 高亮 DONE 状态关键字。
+     当你使用超过上面那种状态时，你可以自定义它们的颜色：通过设置 *org-todo-keyword-faces* 变量来达到这目的：
+
+     #+BEGIN_EXAMPLE
+     (setq org-todo-keyword-faces
+           '(("TODO" . org-warning) ("STARTED" . "yellow")
+             ("CANCELED" . (:foreground "blue" :weight bold))))
+     #+END_EXAMPLE
+
+     
+**** 'TODO' 依赖
+     Org 文件结构很容易定义 TODO 依赖。通常，父的 TODO 不应该标记为 DONE，直到所有的子任务都已经标记为 DONE 了。有时，一些有逻辑顺序子任务，要依赖其他的任务完成后才能开始。
+     如果你自定义了变量 *org-enforce-todo-dependencies* 时，Org 将会阻止你将状态变为 *DONE*  除非所有的子任务都已经标记为 *DONE* 了。
+
+     如果有一个项，它拥有一个属性： *ORDERED* ，那么它的子任务将会一直被阻塞，直到所有比较早的任务都已经标记为 *DONE* 了。例如下面：
+
+     #+BEGIN_EXAMPLE
+     * TODO Blocked until (two) is done
+     ** DONE one
+     ** TODO two
+     * Parent
+       :PROPERTIES:
+       :ORDERED: t
+       :END:
+     ** TODO a
+     ** TODO b, needs to wait for (a)
+     ** TODO c, needs to wait for (a) and (b)
+     #+END_EXAMPLE
+
+     你可以通过使用 *NOBLOCKING* 属性来确保一个项是永远不会被阻塞的：
+     #+BEGIN_EXAMPLE
+     * This entry is never blocked
+       :PROPERTIES:
+       :NOBLOCKING: t
+       :END:
+     #+END_EXAMPLE
+
+
+     * *C-c C-x o* (M-x org-toggle-ordered-properties)
+       将当前项切换 *ORDERED* 属性（即开启或取消 ORDERED 属性）
+     * *C-u C-u C-u C-c C-t* 
+        更改 TODO 状态，避开任意的阻塞状态。
+
+
+
+*** 处理记录
+     Org mode 可以自动记录一个时间戳，当你标记一个 TODO 项为 DONE 时，甚至可以在你每次改变 TODO 项的状态时加上这些记录时间戳。
+
+**** 关闭项
+     当一个 TODO 完成时，你可以跟踪它。通过下面的设置:
+     #+BEGIN_EXAMPLE
+     (setq org-log-done 'time)
+     #+END_EXAMPLE
+
+     每次当你将一个项从 TODO (not-done) 状态变成任意的 DONE 状态时，那么，它就会自动在标题的下面插入一行下面的内容：
+     #+BEGIN_EXAMPLE
+     CLOSED: [timestamp]
+     #+END_EXAMPLE
+
+     当你将状态变成非完成状态时，这一行又将被删除掉。你可以设置 *org-closed-keep-when-no-todo* 设置为非 nil 值时，那么这一行就不会自动被删除。
+
+     如果你想记录一个带有时间戳的笔记时，可以使用：
+     #+BEGIN_EXAMPLE
+     (setq org-log-done 'note)
+     #+END_EXAMPLE
+
+     
+**** 跟踪 TODO 状态的改变
+     变量 *org-log-into-drawer* 当有大量的跟踪日志时，可以定义这些日志抽屉。
+     Org mode 期待为每个 TODO 关键字进行配置格式。格式说明：
+     * '!' :: 表示是时间戳
+     * '@' :: 带有标注的时间戳
+
+
+     例如:
+     #+BEGIN_EXAMPLE
+     (setq org-todo-keywords
+	     '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
+     #+END_EXAMPLE
+
+     注意上面的 *WAIT* 状态是比较特别的，它表示：
+     一个'!'在'/' 后面，意味着，当进入 *WAIT* 状态时，要添加标注，当离开 *WAIT* 状态时，会自动添加时间戳。
+
+     你可以在当前 buffer 中设置这些配置：
+     #+BEGIN_EXAMPLE
+     #+TODO: TODO(t) WAIT(w@/!) | DONE(d!) CANCELED(c@)
+     #+END_EXAMPLE
+
+     也可以在入口时设置：
+     #+BEGIN_EXAMPLE
+     * TODO Log each state with only a time
+       :PROPERTIES:
+       :LOGGING: TODO(!) WAIT(!) DONE(!) CANCELED(!)
+       :END:
+     * TODO Only log when switching to WAIT, and when repeating
+       :PROPERTIES:
+       :LOGGING: WAIT(@) logrepeat
+       :END:
+     * TODO No logging at all
+       :PROPERTIES:
+       :LOGGING: nil
+       :END:
+     #+END_EXAMPLE
+
+
+****  跟踪你的习惯
+     习惯有以下属性：
+     1. 通过自定义 *org-modules* 来开启 *habits* 模块
+     2. 有一个 TODO 项
+     3. 有一个属性 *STYLE* ，它的值为 *habit*
+     4. TODO 项有一个 scheduled 时间，通常是带有 *.+* 重复风格。
+     5. TODO 项有一个最小和最大范围的，语法如下： '.+2d/3d'，它表示你最多花每3天做一次该任务，但通常是每2天做一次。
+     6. 你必须为 *DONE* 状态进行记录。
+        
+        
+     下面是一个例子：
+     #+BEGIN_EXAMPLE
+     ** TODO Shave
+     SCHEDULED: <2009-10-17 Sat .+2d/4d>
+     :PROPERTIES:
+     :STYLE:    habit
+     :LAST_REPEAT: [2009-10-19 Mon 00:36]
+     :END:
+     - State "DONE" from "TODO" [2009-10-15 Thu]
+     #+END_EXAMPLE
+
+
+     下面的配置可以修改 habits 在 agenda 里的显示
+
+     * org-habit-graph-column :: The bu er column at which the consistency graph should be drawn
+     * org-habit-preceding-days :: The amount of history, in days before today, to appear in consistency graphs
+     * org-habit-following-days :: The number of days after today that will appear in consistency graphs
+     * org-habit-show-habits-only-for-today :: If non-nil, only show habits in today’s agenda view. This is set to true by default.
+
+
+
+
+*** 优先级
+    一个带有优先级的 TODO 项，看起来是这样子：
+    #+BEGIN_EXAMPLE
+    *** TODO [#A] Write letter to Sam Fortune
+    #+END_EXAMPLE
+    
+    默认情况下，Org mode 支持三种优先级：
+    * 'A' :: 最高优先级
+    * 'B' :: 没有指明，则是 B 优先级
+    * 'C' :: 最低优先级
+
+
+    优先级可以通过自定义 *org-priority-faces* 来配置高亮的样式。
+    优先级可以设置在任何大纲节点上，不一定需要是 TODO 项。
+
+    | shortcut      | desc                                           | command                             |
+    |---------------+------------------------------------------------+-------------------------------------|
+    | C-c ,         | Set the priority of the current headline       | org-priority                        |
+    | S-up / S-down | Increase/decrease priority of current headline | org-priority-up / org-priority-down |
+
+     你可以修改优先级的范围以及默认的优先级
+     * org-highest-priority
+     * org-lowest-priority
+     * org-default-priority
+
+
+      你也可以为每个独立的 buffer 设置不同的优先级顺序( highest, lowest, default)，类似如下（请确保 highest 优先级在字母表上是比 lowest 优先级更靠前的）：
+      #+BEGIN_EXAMPLE
+      #+PRIORITIES: A C B
+      #+END_EXAMPLE
+
+
+*** 打断任务向下成为子任务
+    通常建议，将大的任务，分成更小的、可管理的子任务。
+    为了看到这些子任务完成的情况，可以在标题后面插入 '[/]' 或者 '[%]' 。它们会在每次子任务状态改变时更新，或者在该标题上按下 *C-c C-c* 。例如：
+    #+BEGIN_EXAMPLE
+    * Organize Party [33%]
+    ** TODO Call people [1/2]
+    *** TODO Peter
+    *** DONE Sarah
+    ** TODO Buy food
+    ** DONE Talk to neighbor
+    #+END_EXAMPLE
+
+
+    如果你喜欢将一个 TODO 项，在所有子任务已经完成的时候，将它自动变成 *DONE* ，你可以使用下面的设置:
+    #+BEGIN_EXAMPLE
+    (defun org-summary-todo (n-done n-not-done)
+       "Switch entry to DONE when all subentries are done, to TODO otherwise."
+       (let (org-log-done org-log-states)   ; turn off logging
+         (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+		(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)         
+    #+END_EXAMPLE
+
+
+*** 复选框
+    在这个列表中，每一个以字符串 '[ ]' 开头的项（注意，中间有个空格），将自动变成复选框。这些项类似 TODO 项，但是它们是更加轻量级的。 复选框并不会包含在全局的 TODO 列表中，因此，它们通常是将一个任务，分解为几个简单的步骤。或者，你可以将它们作用时购物列表。
+    切换复选框状态，可以使用 *C-c C-c* 或者使用鼠标也行（需要 org-mouse.el）。n
+    下面是一个例子：
+    
+    #+BEGIN_EXAMPLE
+    * TODO Organize party [2/4]
+       - [-] call people [1/3]
+         - [ ] Peter
+         - [X] Sarah
+         - [ ] Sam
+       - [X] order food
+       - [ ] think about what music to play
+       - [X] talk to the neighbors
+    #+END_EXAMPLE
+
+
+** 第六章：标签
+   每一个标题都可以包含一个标签列表，它们出现在标题的结尾。标签是普通的单词，它们包含字母、数字，'_'和'@'。
+   标签前后必须跟着一个单冒号，例如：*:work:* , 你也可以标注多个标签，例如： *:work:urgent:* 。
+   默认情况下，标签是跟标题的颜色一样，而且是粗体。你可以通过  *org-tag-faces* 来更改这些配置。
+
+*** 标签中的继承
+    如果标签包含有一个标签，那些所有的子标题，都将会继承它。例如:
+    #+BEGIN_EXAMPLE
+    * Meeting with the French group :work:
+    ** Summary by Frank  :boss:notes:
+    *** TODO Prepare slides for him :action:
+    #+END_EXAMPLE
+
+    那最后一个标题将拥有标签： ':work:', ':boss:', ':notes:' 和 ':action:'，尽管它没有显式地声明这些标签。
+    你也可以设置一些标签，使所有在文件中的入口（entries）都继承这些标签，我们可以假设它是整个文件中的零级别的标签，可以这样子使用它：
+    #+BEGIN_EXAMPLE
+    #+FILETAGS: :Peter:Boss:Secret:
+    #+END_EXAMPLE
+    
+    为了防止继承这些指定的标签，可以使用 *org-tags-exclude-from-inheritance* ， 开启那使用 *org-use-tag-inheritance*
+
+    
+*** 设置标签
+    | shortcut | desc                                                             | command              |
+    |----------+------------------------------------------------------------------+----------------------|
+    | C-c C-q  | Enter new tags for the current headline                          | org-set-tags-command |
+    | C-c C-c  | When the cursor is in a headline, this does the same as C-c C-q. | org-set-tags-command |
+
+
+    你可以全局设置一些硬性标签，通过变量 *org-tag-alist* 。
+    你也可以给指定的文件中设置一些默认的标签，内容类似下面：
+
+    #+BEGIN_EXAMPLE
+    #+TAGS: @work @home @tennisclub
+    #+TAGS: laptop car pc sailboat
+    #+END_EXAMPLE
+
+    如果你已经通过变量 *org-tag-alist* 定义了全局的标签，但是想在文件中使用一个动态的要我们列表，可以添加一个空的 TAGS 到文件中，比如这样子：
+
+    #+BEGIN_EXAMPLE
+    #+TAGS
+    #+END_EXAMPLE
+
+
+     你可以在 emacs 的 init 文件中，配置变量  *org-tag-alist* ，设置输入一个键就会提示标签的配置，例如:
+
+     #+BEGIN_EXAMPLE
+     (setq org-tag-alist '(("@work" . ?w) ("@home" . ?h) ("laptop" . ?l)))
+     #+END_EXAMPLE
+
+
+     如果你只想在当前文本中这样子使用，则可以在文件中添加如下内容:
+
+     #+BEGIN_EXAMPLE
+     #+TAGS: @work(w)  @home(h)  @tennisclub(t)  laptop(l)  pc(p)
+     #+END_EXAMPLE
+
+
+     标签界面会显示所有可用的标签列表。如果你想在指定的标签中以一个新行开始，那就在该标签后面添加一个 '\n' 即可，例如：
+     
+     #+BEGIN_EXAMPLE
+     #+TAGS: @work(w)  @home(h)  @tennisclub(t) \n laptop(l)  pc(p)
+     #+END_EXAMPLE
+
+     或者使用两行：
+     
+     #+BEGIN_EXAMPLE
+     #+TAGS: @work(w)  @home(h)  @tennisclub(t)
+     #+TAGS: laptop(l)  pc(p)
+     #+END_EXAMPLE
+
+     你也可以设置一些标签为一组，例如：
+     
+     #+BEGIN_EXAMPLE
+     #+TAGS: { @work(w)  @home(h)  @tennisclub(t) }  laptop(l)  pc(p)
+     #+END_EXAMPLE
+
+     如果是在变量中设置标签组，则要如下设置:
+     
+     #+BEGIN_EXAMPLE
+      (setq org-tag-alist '((:startgroup . nil)
+                           ("@work" . ?w) ("@home" . ?h)
+                           ("@tennisclub" . ?t)
+                           (:endgroup . nil)
+                           ("laptop" . ?l) ("pc" . ?p)))
+     #+END_EXAMPLE
+
+
+*** 标签等级
+    定义多个标签组，并且嵌套它们，就会产生一个标签等级。
+    搜索一组标签时，它会返回组中所有成员标签以及子组标签。
+    在 agenda 视图中，通过组标签过滤时，它会显示或隐藏那些打了这些组标签成员或子组标签之一的标题。
+    
+    你可以通过方括号，然后再在一个组标签及它相关的标签之间插入一个冒号来设置一个组标签，比如:
+
+    #+BEGIN_EXAMPLE
+    #+TAGS: [ GTD : Control Persp ]
+    #+END_EXAMPLE
+
+    这样子，'GTD' 就是一个组标签，它有两个成员: 'Control' 和 'Persp'。再定义 'Control'， 和 'Persp' 作为一个组标签，就会产生了等级标签，例如：
+    
+    #+BEGIN_EXAMPLE
+    #+TAGS: [ Control : Context Task ]
+    #+TAGS: [ Persp : Vision Goal AOF Project ]
+    #+END_EXAMPLE
+
+    你可以从概念看看作如下的标签等级：
+
+    #+BEGIN_EXAMPLE
+    - GTD
+    	- Persp
+         - Vision
+         - Goal
+         - AOF
+         - Project
+	  	- Control
+         - Context
+         - Task
+    #+END_EXAMPLE
+    
+    在变量 *org-tag-alist* 中设置时，可以使用  *:startgrouptag*, *:grouptags* 和 *:endgrouptag* 来设置这些组标签：
+
+    #+BEGIN_EXAMPLE
+     (setq org-tag-alist '((:startgrouptag)
+                           ("GTD")
+                           (:grouptags)
+                           ("Control")
+                           ("Persp")
+                           (:endgrouptag)
+                           (:startgrouptag)
+                           ("Control")
+                           (:grouptags)
+                           ("Context")
+                           ("Task")
+                           (:endgrouptag)))
+    #+END_EXAMPLE
+
+    组标签成员，也可以是一个正则表达式的，以此来创建一些更具动态性的，基于规则的标签结构，正则在 '{}' 内。例如:
+
+    #+BEGIN_EXAMPLE
+    #+TAGS: [ Vision : {V@.+} ]
+    #+TAGS: [ Goal : {G@.+} ]
+    #+TAGS: [ AOF : {AOF@.+} ]
+    #+TAGS: [ Project : {P@.+} ]
+    #+END_EXAMPLE
+
+    临时忽略组标签: *org-toggle-tags-groups* ，它绑定在 *C-c C-x q*
+    完全禁用组标签: 将变量 *org-group-tags* 设置为 *nil* 即可
+
+
+*** 搜索标签
+    | shortcut         | desc                                                                                                            | command               |
+    |------------------+-----------------------------------------------------------------------------------------------------------------+-----------------------|
+    | C-c / m or C-c \ | Create a sparse tree with all headlines matching a tags/property/TODO search                                    | org-match-sparse-tree |
+    | C-c a m          | Create a global list of tag matches from all agenda  les.                                                       | org-tags-view         |
+    | C-c a M          | Create a global list of tag matches from all agenda  les, but check only TODO items and force checking subitems | org-tags-view         |
+
+     以上这些命令，都会的提示你输入一些基本的布尔逻辑，类似 
+     * '+boss+urgent-project1' :: 表示查找带有标签 'boss' 和 'urgent' 但没有 'project1' 的入口。
+     * 'Kathy|Sally' :: 表示查找带有 'Kathy' 或者 'Sally' 标签的入口。
+
+
+
+** 第七章：属性和列
+   属性是一个与入口相关的键值对。
+   在 Orgmode 中，属性有两种主要的应用。
+   首先，属性像标签，但是它有值。设想你正在维护一份描述 Bug 和计划发行软件的文档。代替使用类似标签： ':release_1:', ':release_2:', 你可以使用一个属性，称为':Release:'，然后在不同的子树中有不同的值，例如: *1.0*  或者 *2.0* 。
+   其次，你可以在一个 Org buffer 中，使用属性来实现一个（非常基本）数据库功能。设想你在跟踪你的音乐 CD，然后属性可以是: album, artist, date of release, number of tracks 等等。
+
+   属性可以方便地编辑 以及在 column 视图中查看
+
+*** 属性语法
+    属性是一个键值对。当它关联入口时，它们需要被插入在一个名为 *PROPERTIES* 的抽屉中，该抽屉是在标题的右下方。每一行一个属性，键在前，然后值在后。键是大小写不敏感的(case-insensitives)。例如：
+
+    #+BEGIN_EXAMPLE
+    * CD collection
+     ** Classic
+     *** Goldberg Variations
+         :PROPERTIES:
+         :Title:     Goldberg Variations
+         :Composer:  J.S. Bach
+         :Artist:    Glen Gould
+         :Publisher: Deutsche Grammophon
+         :NDisks:    1
+         :END:
+    #+END_EXAMPLE
+    
+    取决于变量 *org-use-property-inheritance* 的值，一个属性可以被相关的入口或子树继承。
+    你可能定义一个属性 *:Xyz* 为一个特别的属性：*:Xyz_ALL* ，这种特别的属性是会被继承的。
+
+    如果你想设置一个属性，可以被文件中整个入口继承的，你可以添加类似以下的行：
+    
+    #+BEGIN_EXAMPLE
+    #+PROPERTY: NDisks_ALL 1 2 3 4
+    #+END_EXAMPLE
+
+    你可以按 *C-c C-c* 来激活这些改变。
+
+    如果你想为已经存在的属性中添加值，可以在属性名后面添加'+'。比如下面的设置完 'var' 属性后，它的值为 'foo=1 bar=2'
+
+    #+BEGIN_EXAMPLE
+    #+PROPERTY: var  foo=1
+    #+PROPERTY: var+ bar=2
+    #+END_EXAMPLE
+
+    你也可以为那些继承的属性这样子追加值。
+
+    全局属性 *org-global-properties* 可以被所有的 Org 文件的所有入口继承。
+
+    与属性相关的操作：
+
+    | shortcut                      | desc                                                                                                 | command                                                               |
+    |-------------------------------+------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------|
+    | M-TAB                         | After an initial colon in a line, complete property keys                                             | pcomplete                                                             |
+    | C-c C-x p                     | Set a property                                                                                       | org-set-property                                                      |
+    | C-u M-x org-insert-drawer RET | Insert a property drawer into the current entry                                                      |                                                                       |
+    | C-c C-c                       | With the cursor in a property drawer, this executes property commands                                | org-property-action                                                   |
+    | C-c C-c s                     | Set a property in the current entry                                                                  | org-set-property                                                      |
+    | S-right / S-left              | Switch property at point to the next/previous allowed value                                          | org-property-next-allowed-value / org-property-previous-allowed-value |
+    | C-c C-c d                     | Remove a property from the current entry.                                                            | org-delete-property                                                   |
+    | C-c C-c D                     | Globally remove a property, from all entries in the current  le.                                     | org-delete-property-globally                                          |
+    | C-c C-c c                     | Compute the property at point, using the operator and scope from the nearest column format de nition | org-compute-property-at-point                                         |
+
+
+*** 特别属性
+    * ALLTAGS :: 所有标签，包括继承的
+    * BLOCKED :: 如果任务当前是被阻塞的，它的值为't'
+    * CLOCKSUM ::  在子树中 CLOCK 间隔的总和。前提是 *org-clock-sum* 在当前 buffer 中先被执行过。
+    * CLOCKSUM_T ::  与 CLOCKSUM 一样，不过只计算今天。
+    * CLOSED ::  当入口已经处于 closed 状态时
+    * DEADLINE :: deadline 的时间字符串，没有尖括号的。
+    * FILE ::  与当前入口相关联的文件名
+    * ITEM ::  入口的标题
+    * PRIORITY :: 入口的优先级，一个单字符的字符串
+    * SCHEDULED :: scheduled 时间，没有尖括号的。
+    * TAGS ::  当前标题定义的标签
+    * TIMESTAMP :: 入口第一次没有关键字时的时间戳
+    * TIMESTAMP_IA :: 入口第一次没有激活的时间戳
+    * TODO ::  入口的 TODO 关键字
+
+
+*** 属性搜索
+    | shortcut         | desc                                                                                                                  | command               |
+    |------------------+-----------------------------------------------------------------------------------------------------------------------+-----------------------|
+    | C-c / m or C-c \ | Create a sparse tree with all matching entries. With a C-u pre x argument, ignore headlines that are not a TODO line. | org-match-sparse-tree |
+    | C-c a m          | Create a global list of tag/property matches from all agenda  files                                                   | org-tags-view         |
+    | C-c a M          | Create a global list of tag matches from all agenda  les, but check only TODO items and force checking of subitems    | org-tags-view         |
+    | C-c/p            | Create a sparse tree based on the value of a property                                                                 |                       |
+
+
+*** 属性继承
+    默认情况下，这个功能是关闭的，因为它会导致属性搜索时变得比较慢，并且通常是不需要的。但如果你觉得它非常有用，你可以开启它：*org-use-property-inheritance* 将它设置为 *t* 即可。
+    Org mode 有一些硬编码继承的属性：
+
+    * *COLUMNS* :: 它定义了列视图(column view)的格式
+    * *CATEGORY* :: 对于 agenda 视图，一个目录( :CATEGORY: ) 可以应用到整个子树
+    * *ARCHIVE* :: 对于归档 ，(:ARCHIVE:) 可以归档整个子树的位置。
+    * *LOGGING* :: 定义入口或子树的logging设置。
+
+
+*** 列视图
+    在一个大纲树中查看或编辑属性的一个非常好的方式是使用列视图(column view)
+    在列视图中，每一个大纲节点被转换为表格中的一行。列就是表格提供访问入口的属性。
+
+**** 定义列
+     设置列视图，首先要定义列。它是通过定义列格式行来完成的。
+
+***** 列定义的范围
+      为整个文件定义一个列范围，可以使用类似如下的行：
+      #+BEGIN_EXAMPLE
+      #+COLUMNS: %25ITEM %TAGS %PRIORITY %TODO
+      #+END_EXAMPLE
+
+      仅为指定的树定义一个特定的格式，可以添加一个 *:COLUMNS:* 属性到树的顶层节点，例如:
+      #+BEGIN_EXAMPLE
+      ** Top node for columns view
+        :PROPERTIES:
+        :COLUMNS: %25ITEM %TAGS %PRIORITY %TODO
+        :END:
+      #+END_EXAMPLE
+
+      一个 *:COLUMN:* 属性定义了一个入口自己和它的整个子树的列视图。
+
+
+***** 列属性
+      一个列的定义包含一系列的列属性集合。通常，定义起来像这样子：
+      #+BEGIN_EXAMPLE
+      %[width]property[(title)][{summary-type}]
+      #+END_EXAMPLE
+      
+      除了百分号和属性名，其他都是可选的。不同部分的含义如下:
+
+      * with :: 定义了列的宽度，即多少个字符，如果忽略，则自动计算。
+      * property :: 在该列中应该被编辑的列
+      * title :: 列的标题内容，如果忽略，则用属性名代替
+      * {summary-type} :: 总和类型。如果指定，则列的值为父节点是由子节点计算出来的。summary-type 有:
+        * {+} :: 数字之和
+        * {+;%.1f} :: 类似 +，但是结果以 '%.1f' 格式化。
+        * {$} :: 它是 '+;%.2f' 的缩写
+        * {min} :: 列中最小值
+        * {max} :: 列中最大值
+        * {mean} :: 数字的算术
+        * {X} :: 复选框状态
+        * {X/} :: 复选框状态, '[n/m]'
+        * {X%} :: 复选框状态, '[n%]'
+        * {:} :: 时间之和，HH:MM，纯数字表示小时(hours)
+        * {:min} :: 列中最小时间值
+        * {:max} :: 列中最大时间值
+        * {:mean} :: 时间的算术
+        * {@min} :: 最小周期(用 days/hours/mins/seconds 表示)
+        * {@max} :: 最大周期（用 days/hours/mins/seconds 表示）
+        * {@mean} :: 周期算术
+        * {est+} :: 添加 低-高 估计
+
+
+**** 使用列视图
+
+****** 列视图的开关
+       * *C-c C-x C-c* , (M-x org-columns)
+       * r :: 重做列视图
+       * g :: 重做列视图
+       * q :: 退出列视图
+
+
+****** 编辑值
+       | shortcut                 | desc                                                            | command                                                             |
+       |--------------------------+-----------------------------------------------------------------+---------------------------------------------------------------------|
+       | left / right / up / down | Move through the column view from  eld to  eld.                 |                                                                     |
+       | S-left/right             | Switch to the next/previous allowed value of the  eld           |                                                                     |
+       | 1..9,0                   | Directly select the Nth allowed value, 0 selects the 10th value |                                                                     |
+       | n / p                    | Same as S-left/right                                            | org-columns-next-allowed-value / org-columns-previous-allowed-value |
+       | e                        | Edit the property at point                                      | org-columns-edit-value                                              |
+       | C-c C-c                  | When there is a checkbox at point, toggle it.                   | org-columns-set-tags-or-toggle                                      |
+       | v                        | View the full value of this property.                           | org-columns-show-value                                              |
+       | a                        | Edit the list of allowed values for this property               | org-columns-edit-allowed                                            |
+
+
+****** 修改表结构
+       | shortcut  | desc                                                   | command                                 |
+       |-----------+--------------------------------------------------------+-----------------------------------------|
+       | < or >    | Make the column narrower/wider by one character        | org-columns-narrow /  org-columns-widen |
+       | S-M-right | Insert a new column, to the left of the current column | org-columns-new                         |
+       | S-M-left  | Delete the current column                              | org-columns-delete                      |
+
+       
+**** 捕获列视图
+     一般情况下，列视图会覆盖在一个 buffer 中，它不能被导出或打印。如果你想捕获一个列视图，可以使用 *columnview* 动态块。看起来像这样子：
+
+     #+BEGIN_EXAMPLE
+     * The column view
+     #+BEGIN: columnview :hlines 1 :id "label"
+     #+END:
+     #+END_EXAMPLE
+
+     动态块有下面的参数：
+     - *:id* :: 这是最重要的参数 。即列视图捕获的是哪棵树。它的值有:
+       - local :: 使用捕获块所在的树
+       - global :: 全局树
+       - "file:path-to-file" :: 在这个文件的顶层执行列视图
+       - "ID" :: 为那些有 *:ID:* 属性的树调用列视图
+     - *:hlines* :: 当为 't' 时，为每一行插入一条水平线
+     - *:vlines* :: 当为 't' 时，强制列组带有垂直线
+     - *:maxlevel* :: 当设置为一个值时，不会捕获在这级别下面的入口
+     - *:skip-empty-rows* :: 当为 't' 时，忽略这些空行
+     - *:indent* :: 当为非 nil 时，为每一个 ITEM 进行相应的缩进
+
+
+***** 动态块相关的操作
+      | shortcut               | desc                                           | command                   |
+      |------------------------+------------------------------------------------+---------------------------|
+      | C-c C-x i              | Insert a dynamic block capturing a column view | org-insert-columns-dblock |
+      | C-c C-c or C-c C-x C-u | Update dynamic block at point                  | org-dblock-update         |
+      | C-u C-c C-x C-u        | Update all dynamic blocks                      | org-update-all-dblocks    |
+
+
+** 第八章：日期和时间
+   为了辅助项目计划， TODO 项可以添加一个日期或时间的标签。在 Org mode 中称为 timestamp 。 它在 Org mode 有相当广的含义。
+
+*** timestamp, deadlines, 和 scheduling      
+    timestamp，它是一个日期的规格（可能带有时间或范围时间）格式。比如  ‘<2003-09-16 Tue>’1 or ‘<2003-09-16 Tue 09:39>’ or ‘<2003-09-16 Tue 12:00-12:30>’ 
+    它可以出现 Org 树入口的标题或内容的任何地方。
+    它的出现，会导致入口在 agenda 是的特定日期中显示。我们区分各种不同的 timestamp:
+
+    - 简单的 timestamp / 事件 / 预约期
+      只需将 日期/时间 赋给一个入口即可。它会导致在 timeline 和 agenda 中在特定日期中显示与该时间相关联的标题。例如:
+      #+BEGIN_EXAMPLE
+               * Meet Peter at the movies
+                 <2006-11-01 Wed 19:15>
+               * Discussion on climate change
+                 <2006-11-02 Thu 20:00-22:00>
+      #+END_EXAMPLE
+
+    - 带有重复间隔的 timestamp
+      一个 timestamp 可能包含一个重复的间隔，指明它的应用不仅在给定的日期，而且是在确定的间隔中不断地重复 N 天(d), 周(w), 月(m) 或年(y).下面的设置将会在 agenda 中每个星期三中出现:
+      #+BEGIN_EXAMPLE
+      * Pick up Sam at school
+        <2007-05-16 Wed 12:30 +1w>
+      #+END_EXAMPLE
+
+    - 记事本风格的 sexp 入口
+      对于更复杂的日期规则，Org mode 提供使用特别的 sexp 记事本入口。例如:
+      #+BEGIN_EXAMPLE
+      * 22:00-23:00 The nerd meeting on every 2nd Thursday of the month
+      	<%%(diary-float t 4 2)>
+      #+END_EXAMPLE
+
+    - 时间/日期范围
+      两个 timestamp 通过 '--' 连接表示一个范围。在第一个到第二个范围之间，它会显示在 agenda 视图中。例如:
+      #+BEGIN_EXAMPLE
+       ** Meeting in Amsterdam
+          <2004-08-23 Mon>--<2004-08-26 Thu>
+      #+END_EXAMPLE
+
+    - 不活跃的 timestamp
+      就像简单的 timestamp 一样，不过，是使用方括号来代替尖括号。这些 timestamp 的入口，不会在 agenda 视图中显示的。例如:
+      #+BEGIN_EXAMPLE
+      * Gillian comes late for the fifth time
+        [2006-11-01 Wed]
+      #+END_EXAMPLE
+
+
+*** 创建 timestamp
+    为了让 Org mode 识别 timestamp ，它们需要被指定为正确的格式。所有列在下面的命令都会产生正确的 timestamp 格式
+
+    | shortcut                | desc                                                                               | command                                       |
+    |-------------------------+------------------------------------------------------------------------------------+-----------------------------------------------|
+    | C-c .                   | Prompt for a date and insert a corresponding timestamp.                            | org-time-stamp                                |
+    | C-c !                   | Like C-c ., but insert an inactive timestamp that will not cause an agenda entry.  | org-time-stamp-inactive                       |
+    | C-u C-c . or  C-u C-c ! | Like C-c . and C-c !, but use the alternative format which contains date and time. | org-time-stamp-rounding-minutes               |
+    | C-c C-c                 | Normalize timestamp, insert/ x day name if missing or wrong                        |                                               |
+    | C-c <                   | Insert a timestamp corresponding to the cursor date in the Calendar.               | org-date-from-calendar                        |
+    | C-c >                   | Access the Emacs calendar for the current date                                     | org-goto-calendar                             |
+    | C-c C-o                 | Access the agenda for the date given by the timestamp or -range at point           | org-open-at-point                             |
+    | S-left / S-right        | Change date at cursor by one day                                                   | org-timestamp-down-day / org-timestamp-up-day |
+    | S-up / S-down           | Change the item under the cursor in a timestamp                                    | org-timestamp-up / org-timestamp-down-down    |
+    | C-c C-y                 | Evaluate a time range by computing the di erence between start and end.            | org-evaluate-time-range                       |
+
+
+**** 日期和时间的提示输入
+     下面是一些例子（假设今天是 June 13, 2006）：
+
+     | input        |                                 output |
+     |--------------+----------------------------------------|
+     | 3-2-5        |                             2003-02-05 |
+     | 2/5/3        |                             2003-02-05 |
+     | 14           |                             2006-06-14 |
+     | 12           |                             2006-07-12 |
+     | 2/5          |                             2007-02-05 |
+     | Fri          |  nearest Friday after the default date |
+     | sep 15       |                             2006-09-15 |
+     | feb 15       |                             2007-02-15 |
+     | sep 12 9     |                             2009-09-12 |
+     | 12:45        |                       2006-06-13 12:45 |
+     | 22 sept 0:34 |                       2006-09-22 00:34 |
+     | w4           | ISO week four of the current year 2006 |
+     | 2012 w4 fri  |           Friday of ISO week 4 in 2012 |
+     | 2012-w04-5   |                          Same as above |
+
+     你也可能指定一个相对的时间。输入的那一个东西是 '+' 或 '-' 号，然后一个数字和字母([hdwmy])来指示是 hours(小时）, days(天数）, weeks(周）, months(月）或 years(年）。
+     相对时间总是是相对于今天的。例如:
+
+     | input | outout                      |
+     |-------+-----------------------------|
+     | +0    | today                       |
+     | .     | today                       |
+     | +4d   | four days from today        |
+     | +4    | same as above               |
+     | +2w   | two weeks from today        |
+     | ++5   | five days from default date |
+     | +2tue | second Tuesday from now     |
+     | -wed  | last Wednesday              |
+
+
+     函数可以理解英文的月和星期。如果你想使用其他语言的名字，可以配置变量 *parse-time-months* 和 *parse-time-weekdays* 来达到这目的。
+     
+     不是所有的日期都可以在emacs中实现的。默认情况下， Org mode 强制日期是在 1970-2037 之间。如果你想使用超过这范围的日期，请阅读变量 *org-read-date-force-compatible-dates* 的说明。
+
+     你可以指定时间范围，通过给定起始和结束时间，或者一个起始时间和一个持续时间（用 HH:MM 格式）。使用一个或两个中划线来分隔前一种情况，使用'+'来分隔后一种情况。例如:
+
+     #+BEGIN_EXAMPLE
+     11am-1:15pm => 11:00-13:15
+     11am--1:15pm => same as above
+     11am+2:15 => same as above
+     #+END_EXAMPLE
+    
+
+     从时间提示输入的 minibuffer 中的操作：
+     
+     | action         | desc                                          |
+     |----------------+-----------------------------------------------|
+     | RET            | Choose date at cursor in calendar.            |
+     | mouse-1        | Select date by clicking on it                 |
+     | S-right/left   | One day forward/backward                      |
+     | S-down/up      | One week forward/backward                     |
+     | M-S-right/left | One month forward/backward                    |
+     | > / <          | Scroll calendar forward/backward by one month |
+     | M-v / C-v      | Scroll calendar forward/backward by 3 months  |
+     | M-S-down/up    | Scroll calendar forward/backward by one year  |
+
+
+**** 自定义时间格式
+     Org mode 使用标准的 ISO 国际标准的日期和时间格式，它定义在 ISO 8601
+     如果你不习惯使用这种并且要使用其他的格式来使你感到舒服，你可以通过自定义选项 *org-display-custom-times* 和 *org-time-stamp-custom-formats* 来达到你的目的。
+     
+     *C-c C-x C-t* (M-x org-toggle-time-stamp-overlays) ，切换日期和时间的自定义显示格式。
+
+     Org mode 需要使用默认的格式来进行扫描，所以自定义的日期/时间格式，并不会代替默认的格式，相应的，它只是使用文本的属性来覆盖默认的格式。这会导致下面结果
+     - You cannot place the cursor onto a timestamp anymore, only before or after
+     - The S-up/down keys can no longer be used to adjust each component of a timestamp.
+     - If the timestamp contains a range of clock times or a repeater,these will not be overlaid,
+     - When you delete a timestamp character-by-character, it will only disappear from the bu er after all (invisible) characters belonging to the ISO timestamp have been re- moved.
+     - If the custom timestamp format is longer than the default and you are using dates in tables, table alignment will be messed up. If the custom format is shorter, things do work as expected.
+
+     这样子，还是不要修改这些默认的格式了。
+
+
+**** deadlines 和 scheduling
+     一个 timestamp 可以被特别的关键字处理来加快计划。
+
+     - DEADLINE :: 意味着该任务需要在此日期之前完成。
+                   在一个 deadline 日期中，它会在 agenda 中列出来。额外地，agenda 中的 today 会有一个警告，关于到达或错过了 deadline，从 *org-deadline-warning-days* 天之前的项。它会持续下去，直到该任务标记为 DONE 了。
+                   例如:
+                   #+BEGIN_EXAMPLE
+                   *** TODO write article about the Earth for the Guide
+                   DEADLINE: <2004-02-29 Sun>
+                   The editor in charge is [[bbdb:Ford Prefect]]
+                   #+END_EXAMPLE
+
+     - SCHEDULED :: 意味着该任务会在指定的时间中开始进行。
+                    标题将在该日期之后显示在 agenda 中。如果 scheduled 日期已经过了，它将会一直在 agenda 的 today 视图中，直到该项标记为 DONE. 例如:
+
+                    #+BEGIN_EXAMPLE
+                    *** TODO Call Trillian for a date on New Years Eve.
+                    SCHEDULED: <2004-12-25 Sat>
+                    #+END_EXAMPLE
+
+                    如果你想在 agenda 中延迟显示该任务，可以使用 *SCHEDULED: <2004-12-25 Sat -2d>* 该任务仍然会在 25th 开始，但是会在 agenda 中延迟2天后才显示出来。
+
+                    在任务包含重复间隔时，它会出现在所有延迟的日期中。如果你仅希望出现在第一个延迟的 scheduled 中，可以使用 *--2d* 来代替。
+                    可以参考  *org-scheduled-delay-days* 和 *org-agenda-skip-scheduled-delay-if-deadline* 查看更多详细信息。
+
+                    *注意* ： 在 Org mode 中 scheduling 一项任务，并不能理解为与 scheduling 一个会议一样。设置一个会议，就像一个简单的约会，你应该标注这个入口并带有一个简单的 timestamp ，这会在 agenda 中相应的日期显示了。
+                    这是 Org 用户最容易误解的地方。在 Org mode中， scheduling 意味着设置一个动作的开始日期。
+
+
+***** 插入 deadline 或 schedules
+
+      | shortcut | desc                                                                                                                         | command               |
+      |----------+------------------------------------------------------------------------------------------------------------------------------+-----------------------|
+      | C-c C-d  | Insert 'DEADLINE' keyword along with a stamp                                                                                 | org-deadline          |
+      | C-c C-s  | Insert 'SCHEDULED' keyword along with a stamp.                                                                               | org-schedule          |
+      | C-c / d  | Create a sparse tree with all deadlines that are either past-due, or which will become due within org-deadline-warning-days. | org-check-deadlines   |
+      | C-c / b  | Sparse tree for deadlines and scheduled items before a given date                                                            | org-check-before-date |
+      | C-c / a  | org-check-after-date                                                                                                         | org-check-after-date  |
+
+     
+***** 重复任务
+      你可以为 DEADLINE, SCHEDULED ， 或简单的 timestamp 添加一个重复间隔。例如:
+
+      #+BEGIN_EXAMPLE
+      ** TODO Pay the rent
+        DEADLINE: <2005-10-01 Sat +1m>
+      #+END_EXAMPLE
+
+      *+1m* 表示重复间隔。这可解理为该任务有一个 deadline 为 <2005-10-1>, 然后在从该时间起，每月重复一次。
+      
+      当你标记一个 DEADLINE 或 SCHEDULED 的 TODO 项为 DONE 时，它就不会再出现在 agenda 中了。它会导致下一个重复项并不会被激活。
+      Org mode 通过下面的方式来处理这种情况：你当试图标记这样的入口为 DONE （使用 C-c C-t）是，它会基于基准时间偏移一个重复间隔的时候，然后再将该入口设置为 TODO. 在上的例子中，将它的状态变为 DONE，实际上将会切换日期，类似这样子:
+      #+BEGIN_EXAMPLE
+      ** TODO Pay the rent
+      		DEADLINE: <2005-11-01 Tue +1m>
+      #+END_EXAMPLE
+
+      将一个带有重复的任务标记为 DONE, 使用 *C-- 1 C-c C-t*
+
+      偏移日期后的结果，这个入口将不会在 agenda 中的检查过去日期视图中出现了。但是将来的日期中则是可见的。
+
+      如果你希望任务是在上一次完成的日期为基准时间，再进行偏移的话，你可以使用 *++* 和 *.+* 来进行重复间隔。例如:
+
+      #+BEGIN_EXAMPLE
+      ** TODO Call Father
+        DEADLINE: <2008-02-10 Sun ++1w>
+        Marking this DONE will shift the date by at least one week,
+        but also by as many weeks as it takes to get this date into
+        the future.  However, it stays on a Sunday, even if you called
+        and marked it done on Saturday.
+      ** TODO Empty kitchen trash
+        DEADLINE: <2008-02-08 Fri 20:00 ++1d>
+        Marking this DONE will shift the date by at least one day, and
+        also by as many days as it takes to get the timestamp into the
+        future.  Since there is a time in the timestamp, the next
+        deadline in the future will be on today's date if you
+        complete the task before 20:00.
+      ** TODO Check the batteries in the smoke detectors
+        DEADLINE: <2005-11-01 Tue .+1m>
+        Marking this DONE will shift the date to one month after
+        today.
+      #+END_EXAMPLE
+
+**** 工作时间计时器
+     Org mode 允许你在一个项目中特定的任务上进行计时。当你开始工作一项任务时，你可以开始计时，当你停止一项任务时，你可以停止计时。计时器会记录下你这段工作的时间。
+     它也可以计算一个项目中所有子树的总耗时。
+     你也可以让它记住你任务最近的计时记录。可以设置下面的配置到你的 init 文件中:
+
+     #+BEGIN_EXAMPLE
+     (setq org-clock-persist 'history)
+     (org-clock-persistence-insinuate)
+     #+END_EXAMPLE
+
+***** 计时命令
+      | shortcut           | desc                                                                                                                                        | command                          |
+      |--------------------+---------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------|
+      | C-c C-x C-i        | Start the clock on the current item (clock-in)                                                                                              | org-clock-in                     |
+      | C-c C-x C-o        | Stop the clock (clock-out)                                                                                                                  | org-clock-out                    |
+      | C-c C-x C-x        | Reclock the last clocked task.                                                                                                              | org-clock-in-last                |
+      | C-c C-x C-e        | Update the e ort estimate for the current clock task.                                                                                       | org-clock-modify-effort-estimate |
+      | C-c C-c or C-c C-y | Recompute the time interval after changing one of the timestamps.                                                                           | org-evaluate-time-range          |
+      | C-S-up/down        | On CLOCK log lines, increase/decrease both timestamps so that the clock dura- tion keeps the same.                                          | org-clock-timestamps-up/down     |
+      | S-M-up/down        | On CLOCK log lines, increase/decrease the timestamp at point and the one of the previous (or the next clock) timestamp by the same duration | org-timestamp-up/down            |
+      | C-c C-t            | Changing the TODO state of an item to DONE automatically stops the clock if it is running in this same item.                                | org-todo                         |
+      | C-c C-x C-q        | Cancel the current clock                                                                                                                    | org-clock-cancel                 |
+      | C-c C-x C-j        | Jump to the headline of the currently clocked in task.                                                                                      | org-clock-goto                   |
+      | C-c C-x C-d        | Display time summaries for each subtree in the current buffer                                                                               | org-clock-display                |
+
+      
+***** 计时表
+      Org mode 可以产生非常复杂的基于计时信息的报告。这种报告，被称为 计时表，因为它是格式化为一张或几张 Org 表格。
+      
+      | shortcut               | desc                                                                                         | command                  |
+      |------------------------+----------------------------------------------------------------------------------------------+--------------------------|
+      | C-c C-x C-r            | Insert a dynamic block containing a clock report as an Org mode table into the current  file | org-clock-report         |
+      | C-c C-c or C-c C-x C-u | Update dynamic block at point                                                                | org-dblock-update        |
+      | C-u C-c C-x C-u        | Update all dynamic blocks                                                                    |                          |
+      | S-left/right           | Shift the current :block interval and update the table                                       | org-clocktable-try-shift |
+
+      这有一个计时表的框的例子:
+      #+BEGIN_EXAMPLE
+      #+BEGIN: clocktable :maxlevel 2 :emphasize nil :scope file
+      #+END: clocktable
+      #+END_EXAMPLE
+
+      *BEGIN* 行，它是一些项，定义范围，结构，和报告的格式。这些项都可以在变量 *org-clocktable-defaults* 中进行配置。首先，下面的选项将决定哪些计时入口将被选择：
+      - :maxlevel :: 在表格中最大的深度
+      - :scope :: 范围。可以是下面值的任意一个
+        - nil :: 当前 buffer 或 区域
+        - file :: 当前整个buffer
+        - subtree :: 计时表所在地方的子树
+        - treeN :: 树中的N级别
+        - tree :: 相当于 tree1
+        - agenda :: 所有 agenda 文件
+        - ("file"..) :: 所在这些文件
+        - file-with-archives :: 当前文档以及它的归档
+        - agenda-with-archives :: 所有 agenda 文件，包括归档
+      - :block :: 考虑时间块。可以是绝对时间，也可以是相对时间。格式如下
+        - 2007-12-31 :: New year eve 2007
+        - 2007-12 :: December 2007
+        - 2007-W50 :: ISO-week 50 in 2007
+        - 2007 :: the year 2007
+        - today, yesterday, today-N :: a relative day
+        - thisweek, lastweek, thisweek-N :: a relative week
+        - thismonth, lastmonth, thismonth-N :: a relative month
+        - thisyear, lastyear, thisyear-N :: a relative year
+        - untilnow ::
+      - :tstart :: 开始时间
+      - :tend :: 结束时间
+      - :wstart :: 周的星期几，默认为1，星期一
+      - :mstart :: 月的第几天，默认为1，即月的第一天
+      - :step :: 步进，(week 或者 day)
+      - :stepskip0 :: Do not show steps that have zero time
+      - :fileskip0 :: Do not show table sections from  les which did not contribute
+      - :tags :: A tags match to select entries that should contribute
+
+
+      下面这些选项将决定表的格式。这些选项是通过函数  *org-clocktable-write-default* 解析的，但你也可以指定你自己的函数，使用 *:formatter* 参数：
+      - :emphasize :: When t, emphasize level one and level two items.
+      - :lang :: Language to use for descriptive cells like "Task".
+      - :narrow :: An integer to limit the width of the headline column in the org table
+      - :indent :: Indent each headline  eld according to its level
+      - :tcolumns :: Number of columns to be used for times
+      - :level :: Should a level number column be included?
+      - :sort :: A cons cell like containing the column to sort and a sorting type. E.g., :sort (1 . ?a) sorts the  rst column alphabetically
+      - :compact :: Abbreviation for :level nil :indent t :narrow 40! :tcolumns 1 All are overwritten except if there is an explicit :narrow
+      - :timestamp :: A timestamp for the entry, when available
+      - :properties :: List of properties that should be shown in the table
+      - :inherit-props :: When this  ag is t, the values for :properties will be inherited
+      - :formula :: Content of a #+TBLFM line to be added and evaluated.
+
+                    
+      下面是一些例子
+      为了获得一个当前树级别为1,直到今天的计时表，你可以这样子:
+      #+BEGIN_EXAMPLE
+      #+BEGIN: clocktable :maxlevel 2 :block today :scope tree1 :link t
+      #+END: clocktable
+      #+END_EXAMPLE
+
+      指定时间范围内的，你可以这样子：
+      #+BEGIN_EXAMPLE
+      #+BEGIN: clocktable :tstart "<2006-08-10 Thu 10:00>"
+                         :tend "<2006-08-10 Thu 12:00>"
+      #+END: clocktable
+      #+END_EXAMPLE
+
+      一周之前直到现在，可以写成这样子:
+      #+BEGIN_EXAMPLE
+      #+BEGIN: clocktable :tstart "<-1w>" :tend "<now>"
+      #+END: clocktable
+      #+END_EXAMPLE
+
+      计算当前子树百分比时间，可以这样子：
+      #+BEGIN_EXAMPLE
+      #+BEGIN: clocktable :scope subtree :link t :formula %
+      #+END: clocktable
+      #+END_EXAMPLE
+
+      
+***** 空闲时间和继续计时
+      如果你正在为一个工作项在计时，然后要离开你的电脑，可能是接个电话，你通常需要决定这些离开的时间，是需要从当前计时中减去，还是保留它。
+      通过自定义变量 *org-clock-idel-time* 为一个整数，例如：10 或者 15，emacs 可以在你处在空闲的这几分钟内回来时提醒你，然后会咨询你想要如何处理这些空闲的时间（减去，还是保留它）：
+      * k :: To keep some or all of the minutes and stay clocked in, press k.
+      * K :: If you use the shift key and press K, it will keep however many minutes you request and then immediately clock out of that task.
+      * s :: To keep none of the minutes, use s to subtract all the away time from the clock, and then check back in from the moment you returned.
+      * S :: To keep none of the minutes and just clock out at the start of the away time, use the shift key and press S. Remember that using shift will always leave you clocked out, no matter which option you choose.
+      * C :: To cancel the clock altogether, use C
+
+****** 继续计时 （不是很理解...）
+       你可能想从之前任务的计时继续时，为了系统地开启，可以将 *org-clock-continuously* 为 't' 
+       如果你仅想该次的话，使用三个统一前缀的 *org-clock-in* 和两个 *C-u C-u* 前缀的 *org-clock-in-last*
+
+
+
+
+
+**** 工作量估计(effort estimates)
+     有效地估时是保存一个特别的属性 *EFFORT*
+     * C-c C-x e :: (org-set-effort)，设置工作量估计
+     * C-c C-x C-e :: (org-clock-modify-effort-estimate)，修改
+
+
+     使用工作量估计的最好方式是通过列视图(column view).例如下面的设置:
+
+     #+BEGIN_EXAMPLE
+     #+PROPERTY: Effort_ALL 0 0:10 0:30 1:00 2:00 3:00 4:00 5:00 6:00 7:00
+     #+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM
+     #+END_EXAMPLE
+
+**** 使用计时器做笔记
+     Org 提供两种计时器：一种是顺计时，一种是倒计时。下面是命令:
+     | shortcut  | desc                                                                                                                                                                                                           | command                     |
+     |-----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------|
+     | C-c C-x 0 | Start or reset the relative timer.Start or reset the relative timer. By default, the timer is set to 0. When called with a C-u pre x, prompt the user for a starting o set                                     | org-timer-start             |
+     | C-c C-x ; | Start a countdown timer .Start a countdown timer. The user is prompted for a duration. org-timer- default-timer sets the default countdown value. Giving a numeric pre x argument overrides this default value | org-timer-set-timer         |
+     | C-c C-x . | Insert the value of the current relative or countdown timer into the buffer                                                                                                                                    | org-timer                   |
+     | C-c C-x - | Insert a description list item with the value of the current relative or countdown timer                                                                                                                       | org-timer-item              |
+     | M-RET     | Once the timer list is started, you can also use M-RET to insert new timer items                                                                                                                               | org-insert-heading          |
+     | C-c C-x , | Pause the timer, or continue it if it is already paused.                                                                                                                                                       | org-timer-pause-or-continue |
+     | C-c C-x _ | Stop the timer                                                                                                                                                                                                 | org-timer-stop              |
+
+
+** 第九章：Capture - Refile - Archive
+*** Capture
+    Capture，允许你以少量交互来快速地保存笔记。
+
+**** 设置 Capture
+     下面的自定义设置了笔记的默认目标文件，以及定义了一个全局key来进行 capture.
+     
+     #+BEGIN_EXAMPLE
+     (setq org-default-notes-file (concat org-directory "/notes.org"))
+     (define-key global-map "\C-cc" 'org-capture)
+     #+END_EXAMPLE
+
+
+**** 使用 Capture
+     | shortcut      | desc                                                                   | command              |
+     |---------------+------------------------------------------------------------------------+----------------------|
+     | C-c c         | Call the command org-captur                                            | org-capture          |
+     | C-c C-c       |                                                                        | org-capture-finalize |
+     | C-c C-w       | Finalize the capture process by refiling the note to a different place | org-capture-refile   |
+     | C-c C-k       | Abort the capture process and return to the previous state             | org-capture-kill     |
+     | C-u C-c c     | Visit the target location of a capture template                        |                      |
+     | C-u C-u C-c c | Visit the last stored capture item in its bu er.                       |                      |
+
+
+**** Capture 模板
+     你可以为不同的 capture 项使用不同的类型的模板，以及不同的目标位置。最简单的创建模板的方式是自定义下面的接口:
+     *C-c c C* : 自定义变量 *org-capture-templates*
+
+     例如:
+     #+BEGIN_EXAMPLE
+     (setq org-capture-templates
+       '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+              "* TODO %?\n  %i\n  %a")
+         ("j" "Journal" entry (file+datetree "~/org/journal.org")
+              "* %?\nEntered on %U\n  %i\n  %a")))
+     #+END_EXAMPLE
+
+***** 模板元素
+      * keys :: The keys that will select the template, as a string, characters only.
+      * description :: a short string describing the template
+      * type :: 入口的类型，值可以为
+        - entry :: An Org mode node, with a headline
+        - item :: A plain list item, placed in the  rst plain list at the target location
+        - checkitem :: A checkbox item
+        - table-line :: a new line in the  rst table at the target location.
+        - plain :: Text to be inserted as it is.
+      * target :: Speci cation of where the captured item should be placed.值可以为
+        * (file "path/to/file") :: Text will be placed at the beginning or end of that  file.
+        * (id "id of existing org entry") :: Filing as child of this entry, or in the body of the entry.
+        * (file+headline "path/to/file" "node headline") ::  Fast con guration if the target heading is unique in the file.
+        * (file+olp "path/to/file" "Level 1 heading" "Level 2" ...) :: For non-unique headings, the full path is safer
+        * (file+regexp "path/to/file" "regexp to find location") :: Use a regular expression to position the cursor
+        * (file+datetree "path/to/file") :: Will create a heading in a date tree for today’s date
+        * (file+datetree+prompt "path/to/file") :: Will create a heading in a date tree, but will prompt for the date.
+        * (file+weektree "path/to/file") :: Will create a heading in a week tree for today’s date
+        * (file+weektree+prompt "path/to/file") :: Will create a heading in a week tree, but will prompt for the date.
+        * (file+function "path/to/file" function-finding-location) :: A function to  nd the right location in the file.
+        * (clock) :: File to the entry that is currently being clocked
+        * (function function-finding-location) :: Most general way: write your own function which both visits the  le and moves point to the right location.
+      * template :: The template for creating the capture item
+      * properties :: The rest of the entry is a property list of additional options. 可以为
+        * :prepend :: Normally new captured information will be appended at the target location (last child, last table line, last list item...).
+        * :immediate-finish :: When set, do not o er to edit the information, just  le it away im- mediately.
+        * :empty-lines :: Set this to the number of lines to insert before and after the new item.
+        * :clock-in :: Start the clock in this item.
+        * :clock-keep :: Keep the clock running when  ling the captured entry
+        * :clock-resume :: If starting the capture interrupted a clock, restart that clock when  nished with the capture.
+        * :unnarrowed :: Do not narrow the target bu er, simply show the full buffer.
+        * :table-line-pos :: Speci cation of the location in the table where the new line should be inserted.
+        * :kill-buffer :: If the target  le was not yet visited when capture was invoked, kill the bu er again after capture is completed.
+
+
+
+***** 模板占位符
+
+***** 上下文中的模板
+      可以通过自定义变量 *org-capture-templates-contexts* 来决定指定的上下文才可以访问这些模板。比如:
+      #+BEGIN_EXAMPLE
+      (setq org-capture-templates-contexts
+            '(("p" (in-mode . "message-mode"))))
+      #+END_EXAMPLE
+
+
+**** 附件
+     处理附件的命令:
+     *C-c C-a* (M-x org-attach)
+     输入完后，就会的显示这么多选项了，这些选项都有说明，这里就不再罗列了。
+
+**** RSS 订阅
+     Org 可以添加和改变基于 RSS 和 ATOM 的订阅项。为了访问这些订阅，要配置变量 *org-feed-alist* 。例如:
+     #+BEGIN_EXAMPLE
+     (setq org-feed-alist
+           '(("Slashdot"
+               "http://rss.slashdot.org/Slashdot/slashdot"
+               "~/txt/org/feeds.org" "Slashdot Entries")))
+     #+END_EXAMPLE
+
+     详情可以查看 *org-feed.el* 和 *org-feed-alist* 文档说明。
+
+**** 访问外部协议
+     http://orgmode.org/worg/org-contrib/org-protocol.php
+
+**** refile 和 copy
+     当你 review 这些 capture 数据时，你可能想 refile 或者 copy 这些项到不同的列表，例如到一个项目中。剪切，查找到正确的位置，然后粘贴这些笔记到相应的位置。为了简化这些处理，你可以使用下面特别的命令:
+
+     | shortcut                           | desc                                                                     | name                        |
+     |------------------------------------+--------------------------------------------------------------------------+-----------------------------|
+     | C-c M-w                            | Copying works like re ling, except that the original note is not deleted | org-copy                    |
+     | C-c C-w                            | Refile the entry or region at point                                      | org-refile                  |
+     | C-u C-c C-w                        | Use the re le interface to jump to a heading.                            |                             |
+     | C-u C-u C-c C-w                    | Jump to the location where org-refile last moved a tree to.              | org-refile-goto-last-stored |
+     | C-2 C-c C-w                        | Refile as the child of the item currently being clocked                  |                             |
+     | C-3 C-c C-w                        | Refile and keep the entry in place                                       |                             |
+     | C-0 C-c C-w or C-u C-u C-u C-c C-w | Clear the target cache.                                                  | org-refile-cache-clear      |
+
+
+**** Archiving
+     当一个项目相当于一棵（子）树完成了，你可能想将这些树移出去，并且防止它们继续出现在 agenda 中。这时 archiving 就非常重要了，它可以保持你的工作流文件紧凑和全局搜索时变得快点。
+     
+     | shortcut    | desc                                                                                              | command                     |
+     |-------------+---------------------------------------------------------------------------------------------------+-----------------------------|
+     | C-c C-x C-a | Archive the current entry using the command speci ed in the variable org-archive-default-command. | org-archive-subtree-default |
+
+***** 移动一棵树到一个archive文件    
+
+      | shortcut                   | desc                                                                                               | command             |
+      |----------------------------+----------------------------------------------------------------------------------------------------+---------------------|
+      | C-c C-x C-s or short C-c $ | Archive the subtree starting at the cursor position to the location given by org-archive-location. | org-archive-subtree |
+      | C-u C-c C-x C-s            | Check if any direct children of the current headline could be moved to the archive.                |                     |
+      | C-u C-u C-c C-x C-s        | As above, but check subtree for timestamps instead of TODO entries.                                |                     |
+
+      默认的 archive 位置是一个与当前文件相同目录下的一个文件，它的名字是当前文件名加上 *_archive* 后缀。可以设置变量 *org-archive-location* 修改。
+      也可以直接在当前文件中添加下面的配置来只修改当前文件的 archive 文件:
+
+      #+BEGIN_EXAMPLE
+      #+ARCHIVE: %s_done::
+      #+END_EXAMPLE
+
+      
+***** 内部 archiving
+      如果你仅仅想为 agenda 视图关闭指定的子树，而不是迁移它们到不同的文件，你也可以使用 archive 标签：
+      如果一个标题标记有一个 *:ARCHIVE:* 标签，它保持它的大纲节点，但会有以下这些行为：
+      
+      - 当你调图使用那些循环可见性命令时，它不会被打开（例如 TAB, S-TAB）.你可以通过 *C-TAB* 来强制打开，或者设置选项 *org-cycle-open-archived-trees*。不过，类似 *show-all* 这些大纲命令，它也会显示这些子树。
+      - 在 sparse tree 中，在 archived 的子树里并不会被显示 。除非你配置了选项 *org-sparse-tree-open-archived-trees*
+      - 在 agenda 视图，这些也不会显示 。除非你配置了选项 *org-agenda-skip-archived-tress*
+      - archived 的树并不会显示，只有标题才会被显示。可以配置 *org-export-with-archived-trees*
+      - archived 的树也不会显示在列视图中(column view)，除非将 *org-columns-skip-archived-trees* 设置为 *nil*
+
+        
+      下面的命令将帮助你管理 ARCHIVE 标签:
+
+      | shortcut      | desc                                                                     | command                        |
+      |---------------+--------------------------------------------------------------------------+--------------------------------|
+      | C-c C-x a     | Toggle the ARCHIVE tag for the current headline                          | org-toggle-archive-tag         |
+      | C-u C-c C-x a | Check if any direct children of the current headline should be archived. |                                |
+      | C-TAB         | Cycle a tree even if it is tagged with ARCHIVE                           | org-force-cycle-archived       |
+      | C-c C-x A     | Move the current entry to the Archive Sibling.                           | org-archive-to-archive-sibling |
+
+
+** 第十章： agenda 视图
+   Org 提供几种不同的视图类型
+   * agenda :: 类似一个日历，然后显示指定日期的相应信息（日程表）
+   * TODO 列表 :: 包含所有未完成的动作项
+   * match view 匹配视图 :: 显示基于标签、属性 和 TODO 状态相关联的标题
+   * timeline view 时间线视图 :: 显示单个文件中所有的事件，使用时间排序的视图
+   * text search view 文本搜索视图 :: 从多个文件中搜索指定关键字的所有入口
+   * stuck projects view 耽误的项目视图 :: 显示那些当前不继续的项目
+   * custom view 自定义视图 :: 组合多种不同的视图
+
+        
+   默认情况下，报告会忽略 commented 和 archived 的入口。你可以通过设置 *org-agenda-skip-comment-trees* 和 *org-agenda-skip-archived-trees* 为 *nil* 来改变这个默认的行为。
+
+   这有两个变量来控制 agenda buffer 是如何显示的，以及当退出 agenda 时， window 是如何恢复的的设置：*org-agenda-window-setup* 和 *org-agenda-restore-windows-after-quit*
+
+*** Agenda 文件
+    agenda 视图是从所有的 agenda 文件中收集信息然后将信息显示出来的。这些文件，保存在一个 *org-agenda-files* 变量中。如果这个列表中有一个目录的话，那么该目录下，所有以 *.org* 结尾的文件，都将会成为 agenda 文件的一部分。
+    所以，即使你只有一个 Org 文件，它也应该要放进这个列表中。你可以自定义 *org-agenda-files* ， 但是最简单的管理方式是通过下面这些命令:
+
+    | shortcut             | desc                                                                           | command                  |
+    |----------------------+--------------------------------------------------------------------------------+--------------------------|
+    | C-c [                | Add current  le to the list of agenda  les.                                    | org-agenda-file-to-front |
+    | C-c ]                | Remove current file from the list of agenda files.                             | org-remove-file          |
+    | C-' or C-,           | Cycle through agenda  le list, visiting one  le after the other                | org-cycle-agenda-files   |
+    | M-x org-iswitchb RET | Command to use an iswitchb-like interface to switch to and between Org bu ers. |                          |
+   
+    Org 菜单也可以。
+
+    如果人想在一个文件中临时聚集 agenda （该文件并不在 org-agenda-files 列表中），或者仅一个文件在该列表中，甚至只是一个文件中的一个子树，这可以有几种方式来做到这个目的。下面这些命令:
+
+    | shortcut  | desc                                                   | command                            |
+    |-----------+--------------------------------------------------------+------------------------------------|
+    | C-c C-x < | Permanently restrict the agenda to the current subtree | org-agenda-set-restriction-lock    |
+    | C-c C-x > | Remove the permanent restriction created by C-c C-x <  | org-agenda-remove-restriction-lock |
+
+    当与 *speedbar.el* 一起工作时，你可以使用以下这些命令:
+    - *<* :: org-speedbar-set-agenda-restriction
+    - *>* :: org-agenda-remove-restriction-lock
+
+
+*** Agenda 调度器
+    agenda 视图是通过一个调度器来创建的，调度器是绑定到一个全局的按键 *C-c a* 。然后它会有许多提供的选项。
+
+
+*** 内建的 agenda 视图 (C-c a，然后就有这么多选项了）
+**** weekly / daily （周/日）agenda 视图
+     *C-c a a* (M-x org-agenda-list)
+
+     默认在 agenda 中显示的天数，是通过变量 *org-agenda-span* (或者已经弃用的 *org-agenda-ndays* ）。它的值可以是任何天数的数字，或者一个持续时间的名字，例如: *day*, *week*, *month* 或者 *year*
+     对于 weekly agenda ，默认的开始时间，是过去的周一（参看 *org-agenda-start-on-weekday* ），你也可以使用一个日期偏移：*(setq org-agenda-start-day "+10d")* ，这会导致 agenda 显示的旱为现在到未来10天。
+
+
+**** Calendar/ Diary  集成
+     calendar 显示的是一个三个月的日历，带有不同国家和文化的不同节日
+     diary 允许你跟踪一个周年纪念日、月相、日出日落，周期性的约会（每周、每月）等等。这样，它与 Org 是相当互补的。组合 Org 与 diary 是相当有用的。
+      
+     为了从emacs的 diary 中包含这些入口到 Org mode 的 agenda，你仅需要自定义下面的变量即可：
+
+     #+BEGIN_EXAMPLE
+     (setq org-agenda-include-diary t)
+     #+END_EXAMPLE
+
+     设置完后，所有的东西都会自动地进行。所有的 diary 入口，包括节日、周年纪念等，都将包含到 agenda buffer 中来。*SPC* , *TAB* ， *RET* 可以从 agenda buffer 中跳转到 diary 文件去编辑这些入口。
+     *i* 命令可以插入一个新的入口到 agenda buffer 的当前日期中。
+     *S*, *M*, *C* 可以显示日出日落时间，显示月相，以及转换为其他的日历。
+     *c* 可以从 calendar 与 agenda 之间切换。
+
+
+**** 将周年纪念保存到 BBDB
+
+**** 约会提醒
+     Org 可以与 Emacs 的约会提醒通知地方进行交互。为了添加一个约会到你的 agenda 文件，可以使用命令 *org-agenda-to-appt* 。该命令会让你过虑掉你的约会，然后仅添加这些属性特定目录或符合一个正则表达式的约会。
+     它也会读取 *APPT_WARNTIME* 属性，它会覆盖该约会的 *appt-message-warning-time* 的值。
+
+**** 全局 TODO 列表
+     *C-c a t* (M-x org-todo-list)
+     *C-c a T* (M-x org-todo-list)
+
+
+
+*** 描述和排序
+    通过选项 *org-agenda-tags-column* 来自定义 agenda 的列标签显示。
+    通过选项 *org-agenda-prefix-format* 来自定义前缀格式。
+
+**** 目录
+     在 agenda 中，目录是与相应的项相关联的。默认情况下，目录是简单的文件名，但你也可以在 buffer 中写入一个特别的行来指定目录：
+
+     #+BEGIN_EXAMPLE
+     #+CATEGORY: Thesis
+     #+END_EXAMPLE
+
+
+     如果你想为单一的入口（或子树）来指定一个目录(CATEGORY)，你可以在入口上加上一个属性 *:CATEGORY:* 
+     如果你的目录没有超过10个字符，这在 agenda buffer 中看起来是最适合的。
+     你呆以为目录设置一些图标，通过自定义变量 *org-agenda-category-icon-alist* 即可。
+
+
+**** 时刻规格
+     对于 agenda 显示来说，Org mode 会将时间显示为 24 小时的格式来作为前缀。看起来像这样子：
+     
+     #+BEGIN_EXAMPLE
+     8:30-13:00 Arthur Dent lies in front of the bulldozer
+     12:45...... Ford Prefect arrives and takes Arthur to the pub
+     19:00...... The Vogon reads his poem
+     #+END_EXAMPLE
+
+     时间的网格可以通过变量 *org-agenda-use-time-grid* 来切换开关。
+     可以通过 *org-agenda-time-grid* 来进行配置。
+
+
+**** 排序 agenda 项
+     对于 daily 或 weely 视图，agenda 是按每天来排序的
+     对于 TODO 列表视图，根据目录、优先级以及 schedule 日期排序 
+     对于 标签匹配，则根据首先搜索到的顺序来显示
+
+     可以通过变量 *org-agenda-sorting-strategy* 来自定义排序策略。
+
+
+**** 过滤/限制 agenda 项
+     
+***** 过滤
+
+      | shortcut | desc                                                                                                      | command                           |
+      |----------+-----------------------------------------------------------------------------------------------------------+-----------------------------------|
+      | /        | Filter the agenda view with respect to a tag and/or e ort estimates                                       | org-agenda-filter-by-tag          |
+      | <        | Filter the current agenda view with respect to the category of the item at point                          | org-agenda-filter-by-category     |
+      | ^        | Filter the current agenda view and only display the siblings and the parent headline of the one at point. | org-agenda-filter-by-top-headline |
+      | =        | Filter the agenda view by a regular expression                                                            | org-agenda-filter-by-regexp       |
+      | _        | Filter the agenda view with respect to effort estimates                                                   | org-agenda-filter-by-effort       |
+      | \vert    | Remove all  lters in the current agenda view                                                              | org-agenda-filter-remove-all      |
+      |          |                                                                                                           |                                   |
+
+
+***** 限制
+      
+      * org-agenda-max-entries :: Limit the number of entries.
+      * org-agenda-max-effort :: Limit the duration of accumulated e orts (as minutes)
+      * org-agenda-max-todos :: Limit the number of entries with TODO keywords
+      * org-agenda-max-tags :: Limit the number of tagged entries
+      * org-agenda-limit-interactively :: This prompts for the type of limit to apply and its value.
+
+
+
+*** agenda buffer 的命令
+**** 移动
+
+     | shortcut | desc                                                          | command                  |
+     |----------+---------------------------------------------------------------+--------------------------|
+     | n        | next line(same as down, C-n)                                  | org-agenda-next-line     |
+     | p        | previous line (same as up, C-p)                               | org-agenda-previous-line |
+     | N        | next item: same as next line, but only consider items.        | org-agenda-next-item     |
+     | P        | previous item: same as previous line, but only consider items | org-agenda-previous-item |
+
+**** 查看/跳转到 Org 文件
+
+     | shortcut       | desc                                                                 | command                            |
+     |----------------+----------------------------------------------------------------------+------------------------------------|
+     | SPC or mouse-3 | Display the original location of the item in another window          | org-agenda-show-and-scroll-up      |
+     | L              | Display original location and recenter that window                   | org-agenda-recenter                |
+     | TAB or mouse-2 | Go to the original location of the item in another window            | org-agenda-goto                    |
+     | RET            | Go to the original location of the item and delete other windows     | org-agenda-switch-to               |
+     | F              | Toggle Follow mode.                                                  | org-agenda-follow-mode             |
+     | C-c C-x b      | Display the entire subtree of the current item in an indirect buffer | org-agenda-tree-to-indirect-buffer |
+     | C-c C-o        | Follow a link in the entry                                           | org-agenda-open-link               |
+
+
+**** 更改显示
+     
+     | shortcut           | desc                                                                                                   | command                            |
+     |--------------------+--------------------------------------------------------------------------------------------------------+------------------------------------|
+     | A                  | Interactively select another agenda view and append it to the current view.                            |                                    |
+     | o                  | delete other windows                                                                                   |                                    |
+     | v d or short d     |                                                                                                        | org-agenda-day-view                |
+     | v w or short w     |                                                                                                        | org-agenda-week-view               |
+     | v t                |                                                                                                        | org-agenda-fortnight-view          |
+     | v m                |                                                                                                        | org-agenda-month-view              |
+     | v y                |                                                                                                        | org-agenda-year-view               |
+     | v SPC              |                                                                                                        | org-agenda-reset-view              |
+     | f                  | Go forward in time to display the following org-agenda-current-span days                               | org-agenda-later                   |
+     | b                  | Go backward in time to display earlier dates                                                           | org-agenda-earlier                 |
+     | .                  | Go to today                                                                                            | org-agenda-goto-today              |
+     | j                  | Prompt for a date and go there.                                                                        | org-agenda-goto-date               |
+     | J                  | Go to the currently clocked-in task in the agenda buffer                                               | org-agenda-clock-goto              |
+     | D                  | Toggle the inclusion of diary entries                                                                  | org-agenda-toggle-diary            |
+     | v l or short l     | Toggle Logbook mode                                                                                    | org-agenda-log-mode                |
+     | v [ or [           | Include inactive timestamps into the current view                                                      | org-agenda-manipulate-query-add    |
+     | v a                | Toggle Archives mode                                                                                   | org-agenda-archives-mode           |
+     | v A                | Toggle Archives mode                                                                                   | org-agenda-archives-mode 'files    |
+     | v R or short R     | Toggle Clockreport mode.                                                                               | org-agenda-clockreport-mode        |
+     | v c                | Show overlapping clock entries, clocking gaps, and other clocking problems in the current agenda range |                                    |
+     | v E or short E     | Toggle entry text mode.                                                                                | org-agenda-entry-text-mode         |
+     | G                  | Toggle the time grid on and off                                                                        | org-agenda-toggle-time-grid        |
+     | r                  | Recreate the agenda buffer                                                                             | org-agenda-redo                    |
+     | g                  | same as r                                                                                              | org-agenda-redo                    |
+     | C-x C-s or short s | save all org buffers                                                                                   | org-save-all-org-buffers           |
+     | C-c C-x C-c        | Invoke column view                                                                                     | org-agenda-columns                 |
+     | C-c C-x >          | Remove the restriction lock on the agenda, if it is currently restricted to a  le or subtree           | org-agenda-remove-restriction-lock |
+
+
+**** 向前或向后拖动 agenda 行
+     M-up
+     M-down
+
+**** 日历命令
+     | short                                      | desc                                                                                                         | command                   |
+     |--------------------------------------------+--------------------------------------------------------------------------------------------------------------+---------------------------|
+     | c                                          | Open the Emacs calendar and move to the date at the agenda cursor                                            | org-agenda-goto-calendar  |
+     | c                                          | When in the calendar, compute and show the Org mode agenda for the date at the cursor.                       | org-calendar-goto-agenda  |
+     | i                                          | Insert a new entry into the diary, using the date at the cursor and (for block entries) the date at the mark | org-agenda-diary-entry    |
+     | M                                          | Show the phases of the moon for the three months around current date.                                        | org-agenda-phases-of-moon |
+     | S                                          | Show sunrise and sunset times.                                                                               | org-agenda-sunrise-sunset |
+     | C                                          | Convert the date at cursor into many other cultural and historic calendars.                                  | org-agenda-convert-date   |
+     | H                                          | Show holidays for three months around the cursor date.                                                       | org-agenda-holidays       |
+     | M-x org-icalendar-combine-agenda-files RET | Export a single iCalendar file containing entries from all agenda files                                      |                           |
+
+
+**** 导出到文件
+
+     C-x C-w （M-x org-agenda-write）
+
+**** 退出和终止
+     q : 退出 agenda buffer
+     x : 退出 agenda buffer 以及所有由 agenda 打开的 buffer
+
+
+*** 自定义 agenda 视图
+    目的：保存和快速访问使用 TODO 和 标签搜索以及创建一个特定组合的 agenda buffer.
+    它是通过 dispatcher （调度器，参考上面的 agenda 调度器）来实现的。
+
+
+**** 保存搜索
+     自定义命令，可以通过变量 *org-agenda-custom-commands* 来配置。你可以直接在 init 文件中设置它。下面是一个例子:
+
+     #+BEGIN_EXAMPLE
+     (setq org-agenda-custom-commands
+           '(("x" agenda)
+             ("y" agenda*)
+             ("w" todo "WAITING")
+             ("W" todo-tree "WAITING")
+             ("u" tags "+boss-urgent")
+             ("v" tags-todo "+boss-urgent")
+             ("U" tags-tree "+boss-urgent")
+             ("f" occur-tree "\\<FIXME\\>")
+             ("h" . "HOME+Name tags searches") ; description for "h" prefix
+             ("hl" tags "+home+Lisa")
+             ("hp" tags "+home+Peter")
+             ("hk" tags "+home+Kim")))
+     #+END_EXAMPLE
+
+     即在按下 *C-c a* 后，再按上面的命令即可达到你自己的自定义视图了。
+
+** 第十一章：标记丰富的导出
+   
+*** 段落，换行和引用
+    段落是通过至少一个空行来分隔的。如果你需要强制在一行中来进行段落中断的话，可以在该行尾使用 '\\' 来达到目的。
+    
+    在一个区域中，为了保留换行，缩进和空行，你可以使用下面的指令，它也可以用来格式化诗歌。
+
+    #+BEGIN_VERSE
+    Great clouds overhead
+    Tiny black birds rise and fall
+    Snow covers Emacs
+          -- AlexSchroeder
+    #+END_VERSE
+
+
+    当从其他文档中引用内容时，它惯例格式化为一个段落，它会在左右两边都进行缩进以留空白。这种文本，你可以使用以下指令：
+
+    #+BEGIN_QUOTE
+    Everything should be made as simple as possible,
+    but not any simpler -- Albert Einstein
+    #+END_QUOTE
+
+    如果你喜欢居中文本，你可以这样子：
+    
+    #+BEGIN_CENTER
+    #+BEGIN_CENTER
+    Everything should be made as simple as possible, \\
+    but not any simpler
+    #+END_CENTER
+
+    
+
+*** 强调和等宽
+    粗体: *blod*
+    斜体: /italic/
+    下划线: _underlined_
+    原义: =verbatim=
+    代码: ~code~
+    ‘+strike-through+’
+
+    在代码和原义中的字符串，并不会被 Org mode 进行特别处理，它们会原样输出。
+
+    为了关闭这些标记文本，你可以设置 *org-fontify-emphasized-text* 为 *nil* 即可。
+    为了缩小这些可用标记的语法，你可以自定义选项 *org-emphasis-alist*
+    要微调哪些字符可以允许在标记字符的前后出现，你可以调整 *org-emphasis-regexp-components* 
+    
+    注意，如果你修改了以上配置之一，它不会马上生效的，直到你重新加载 Org 文件才会生效，这可能需要你重启 emacs.
+
+
+*** 水平线
+    一个仅有点的行，而且至少要有5个点，它就会被视作是一条水平线
+
+
+*** 图片 和 表格
+    Org mode 的表格以及 *table.el* 包的表格都可以被导出。
+    
+    对于 Org mode 的表格，第一条水平线上面的分隔行，将成为表格头行。
+
+    #+BEGIN_EXAMPLE
+    #+CAPTION: This is the caption for the next table (or link)
+    #+NAME:   tab:basic-data
+        | ... | ...|
+        |-----|----|
+    #+END_EXAMPLE
+
+    插入图片：链接没有描述，只有单纯的链接，将会被导出:
+    [[./img/a.jpg]]
+    
+    如果你想为这图上加上说明，可以这样子:
+
+    #+BEGIN_EXAMPLE
+    #+CAPTION: This is the caption for the next figure link (or table)
+    #+NAME:   fig:SED-HR4049
+    [[./img/a.jpg]]
+    #+END_EXAMPLE
+
+
+*** 字面例子
+    你可能包含不应该进行标记的字面例子。这些例子将以等宽字体输出，所以，它比较适合源码以及相似的例子:
+    
+    #+BEGIN_EXAMPLE
+    Some example from a text file.
+    #+END_EXAMPLE
+
+
+    对于简单的而小的例子，可以这样子简化：
+
+    Here is an example
+       : Some example from a text file
+
+    即冒号前有额外的空格，以及冒号后有一个空格的文本，也是 example 。
+
+    如果你的例子是一种编程语言的源码，那你可以使用 src 块。例如：
+
+    #+BEGIN_SRC emacs-lisp
+    (defun org-xor (a b)
+          "Exclusive or."
+          (if a (not b) b))
+    #+END_SRC
+
+
+    在 src 块中，你可以在 BEGIN 行的最后添加 *-n* 来显示行号。如果你使用的是 *+n* 则会接着上一个 src 块的数字继续下去。
+
+    #+BEGIN_SRC emacs-lisp -n 20
+      ;; this will export with line number 20
+      (message "This is line 21")
+     #+END_SRC
+     #+BEGIN_SRC emacs-lisp +n 10
+      ;; This will be listed as line 31
+      (message "This is line 32")
+     #+END_SRC
+
+
+     Org 会解析类似 '(ref:name)' 这些字符串为标签，将它们作为指定的超链接目标，比如 [[name]]
+     你可以添加 *-r* 来移除这些标签。
+
+     例子:
+
+     #+BEGIN_SRC emacs-lisp -n -r
+     (save-excursion                  (ref:sc)
+        (goto-char (point-min)))      (ref:jump)
+     #+END_SRC
+     In line [[(sc)]] we remember the current position.  [[(jump)][Line (jump)]]
+     jumps to point-min.
+
+     最后，你可以使用 *-i* 来保留这些代码块的缩进。
+
+     如果标签(label)的语法与编程语言的语法冲突，可以使用 *-l* 来更改这些格式。例如: *#+BEGIN_SRC pascal -n -r -l "((%s))"* 也可以查看变量 *org-coderef-label-format*
+     HTML的导出会将 example 导出为 text area.
+
+     由于会经常使用 *#+BEGIN_... and #+END_... * 所以为它们提供了快捷键。
+
+
+*** 特殊符号
+    你可以使用 Latex 风格的语法来插入特殊的符号——命名实体——比如 '\alpha' 来指示希腊字母，或者 '\to' 指示箭头。补全这些符号仅需要输入 '\' 然后接着几个字母，最后按 *M-TAB* 就可以看到所有可以补全了。
+    如果你需要在单词中使用这种符号，可以在它的结束加上一对大括号。例如：
+
+    #+BEGIN_EXAMPLE
+    Protip: Given a circle \Gamma of diameter d, the length of its circumference is \pi{}d
+    #+END_EXAMPLE
+
+    Org 提供了大量的HTML和Latex的实体符号，你可以通过下面的命令来浏览它: *M-x org-entities-help* ，它也可以提供你自定义的符号，通过配置变量 *org-entities-user* 即可。
+    
+    在 Org 文档中，实体可能用来进行转义标记。例如：
+    '\under{}not underlined\under' 会导出为 '_not underlined_' .
+    
+
+*** 上标和下标
+    '^' 和 '_' 是用来指示上标和下标。例如:
+
+    #+BEGIN_EXAMPLE
+     The radius of the sun is R_sun = 6.96 x 10^8 m.  On the other hand, the
+     radius of Alpha Centauri is R_{Alpha Centauri} = 1.28 x R_{sun}.
+    #+END_EXAMPLE
+
+    如果下划线在不同的上下文中会经常使用，那你可以设置变量 *org-use-sub-superscripts* 来修改这个规则。例如，你将这个变量设置为 '{}' ，那么 'a_b' 就不会解析下标了，但是 'a_{b}' 就会。
+
+
+*** 嵌套 Latex
+    通常纯 ASCII 已经对于大多数笔记来说已经足够了。除了科学笔记，它通常包含数学符号和公式。Latex 是用得比较广泛的用来做科学笔记的文档。Org mode 支持内嵌使用 Latex 代码。
+
+**** Latex 片段
+     它不需要任何特别的标记的，例如:
+
+     #+BEGIN_EXAMPLE
+     \begin{equation}
+     x=\sqrt{b}
+     \end{equation}
+     If $a^2=b$ and \( b=2 \), then the solution must be
+     either $$ a=+\sqrt{2} $$ or \[ a=-\sqrt{2} \].
+     #+END_EXAMPLE
+
+     就是一个 Latex 片段了。
+
+     Latex 可以通过配置变量 *org-export-with-latex* 来进行处理。默认为 't'， 表示对 HTML 导出时会进行处理，但对 ASCII 和 Latex 后端不进行处理。你也可以为每个文件独立设置这些行。例如:
+
+     #+BEGIN_EXAMPLE
+     #+OPTIONS: tex:t    Do the right thing automatically (MathJax)
+     #+OPTIONS: tex:nil  Do not process LATEX fragments at all
+     #+OPTIONS: tex:verbatim Verbatim export, for jsMath or so
+     #+END_EXAMPLE
+
+
+**** 预览 Latex 片段
+     如果你已经安装了 Latex 和 *dvipng* , *dvisvgm* 或者 *convert* ，那就可以处理 Latex 片段生成图片了。
+     你可以自定义变量 *org-format-latex-options* 和 *org-format-latex-header* 来影响这些预览。
+     特别地 *:scale* （对于 HTML 导出的话是 *:html-scale* ）属性可以用来调整预览图片的大小。
+
+     *C-c C-x C-l* ：生成 Latex 的预览图片。
+     *C-c C-c* ：移除浏览图片。
+
+     你也可以在文件进行配置预览:
+
+     #+BEGIN_EXAMPLE
+     开启预览
+     #+STARTUP: latexpreview  
+     
+     关闭预览
+     #+STARTUP: nolatexpreview
+     #+END_EXAMPLE
+
+
+**** 使用 CDLATEX 输入数学公式
+
+     *M-x org-cdlatex-mode RET*
+
+     或者全局配置
+     
+     *(add-hook 'org-mode-hook 'turn-on-org-cdlatex)*
+
+     详细可以参考它的文档说明。
+
+
+     
+
+
+** 第十二章：导出
+   导出的格式支持:
+   * ascii
+   * beamer (latex beamer format)
+   * html
+   * icalendar
+   * latex
+   * md (markdown format)
+   * odt (OpenDocument text format)
+   * org
+   * textinfo (Textinfo format)
+   * man (man page format)
+
+
+   更多的请参考 *contrib/* 目录。
+   默认情况下，已经加载了以下5个后台：ascii, html, icalendar, latex 和 odt. 其他的需要显式地加载，可通过自定义 *org-export-backends* 或者 "(require 'ox-md)"
+
+*** 导出调度器(export dispatcher)
+    *C-c C-e* 后，即可看到各种导出格式了。(M-x org-export-dispatch)
+
+
+
+*** 导出设置
+    在 buffer 中设置，可以出现在文件的任何地方，也可以直接或间接地通过使用 *#+SETUPFILE: filename* 语法来进行包含文件来设置。
+    可以你输入 *#+* 然后按 *M-TAB* 来进行补全。
+    下面这些导出关键字是对所有的后台处理都能用的。它们等同于全局变量，包括：
+
+    * AUTHOR :: 文档作者，(user-full-name)
+    * CREATOR :: 创建者，(org-export-creator-string)
+    * DATE :: 日期或时间。它的格式可以通过 *org-export-date-timestamp-format* 来配置
+    * EMAIL :: 邮箱地址 (user-mail-address)
+    * LANGUAGE :: 使用的语言（用于翻译某些字符串）。例如 *#+LANGUAGE: fr* 。可以通过 *org-export-default-language* 来设置默认语言。
+    * SELECT_TAGS :: 用于选择一个树来导出的标签 ( *org-export-select-tags*  ) 。默认值为 *:export:*
+    * EXCLUDE_TAGS :: 用于不导出某些树 ( *org-export-exclude-tags* )
+      * TITLE :: 显示标题。
+
+
+**** *#+OPTIONS*
+     它可以与下面的参数紧凑
+
+     - ': => Toggle smart quotes (org-export-with-smart-quotes)
+     - *: => Toggle emphasized text (org-export-with-emphasize).
+     - -: => Toggle conversion of special strings (org-export-with-special-strings).
+     - :: => Toggle  xed-width sections (org-export-with-fixed-width).
+     - <: => Toggle inclusion of any time/date active/inactive stamps (org-export-with- timestamps).
+     - \n => Toggle line-break-preservation (org-export-preserve-breaks).
+     - ^: => Toggle TEX-like syntax for sub- and superscripts.
+     - arch: => Configure export of archived tree
+     - author: => Toggle inclusion of author name into exported  le (org-export-with-author).
+     - broken-links: => Decide whether to raise an error or not when encountering a broken internal link
+     - c: => Toggle inclusion of CLOCK keywords (org-export-with-clocks).
+     - creator: => Toggle inclusion of creator info into exported  le (org-export-with-creator).
+     - d: => Toggle inclusion of drawers, or list drawers to include (org-export-with-drawers)
+     - date: => Toggle inclusion of a date into exported  le (org-export-with-date)
+     - e: => Toggle inclusion of entities (org-export-with-entities)
+     - email: => Toggle inclusion of the author’s e-mail into exported file (org-export-with- email).
+     - f: => Toggle the inclusion of footnotes (org-export-with-footnotes).
+     - H: => Set the number of headline levels for export (org-export-headline-levels)
+     - inline: => Toggle inclusion of inlinetasks (org-export-with-inlinetasks).
+     - num: => Toggle section-numbers (org-export-with-section-numbers).
+     - p: => Toggle export of planning information (org-export-with-planning).
+     - pri: => Toggle inclusion of priority cookies (org-export-with-priority).
+     - prop: => Toggle inclusion of property drawers, or list properties to include (org-export-with-properties).
+     - stat: => Toggle inclusion of statistics cookies (org-export-with-statistics-cookies).
+     - tags: => Toggle inclusion of tags, may also be not-in-toc (org-export-with-tags)
+     - tasks: => Toggle inclusion of tasks (TODO items), can be nil to remove all tasks, todo to remove DONE tasks, or a list of keywords to keep (org-export-with-tasks)
+     - tex: => Con gure export of LATEX fragments and environments.
+     - timestamp: => Toggle inclusion of the creation time into exported  file (org-export-time- stamp-file)
+     - title: => Toggle inclusion of title (org-export-with-title)
+     - toc: => Toggle inclusion of the table of contents, or set the level limit (org-export-with-toc).
+     - todo: => Toggle inclusion of TODO keywords into exported text (org-export-with- todo-keywords).
+     - |: => Toggle inclusion of tables (org-export-with-tables).
+
+
+
+*** 内容表格(Table of contents)
+    默认的深度是与标题的深度一样。但你可以选择一个更小的数值，或者完全关闭它。可以通过配置 *org-export-with-toc* 来配置，或者为每一个文件添加以下的行:
+
+    #+BEGIN_EXAMPLE
+    #+OPTIONS: toc:2 only inlcude two levels in TOC 
+    #+OPTIONS: toc:nil no default TOC at all
+    #+END_EXAMPLE
+
+
+    如果你想将toc放在不同的地方，那你应该关闭默认的配置 *org-export-with-toc* 或者 *#+OPTIONS* ，然后插入 *#+TOC: headlines N* 到你想将toc放到的地方。例如:
+
+    #+BEGIN_EXAMPLE
+    #+OPTIONS: toc:nil no default TOC
+    ...
+    #+TOC: headlines 2 insert TOC here, with two headline levels
+    #+END_EXAMPLE
+
+
+    如果你追加一个 *local* 参数，那么toc仅会为当前节点的子节点生成toc。这样子的话，深度就是相对于当前节点的级别了。例如:
+
+    #+BEGIN_EXAMPLE
+    * Section
+    #+TOC: headlines 1 local                            insert local TOC, with direct children only
+    #+END_EXAMPLE
+
+    同样地 TOC 关键字也可以生成一个所有表格的列表。例如:
+    
+    #+BEGIN_EXAMPLE
+    #+TOC: listings build a list of listings 
+    #+TOC: tables build a list of tables
+    #+END_EXAMPLE
+
+
+*** 包含文件
+    在导出期间，你可以包含其他文件的内容。例如:
+
+    #+BEGIN_EXAMPLE
+    #+INCLUDE: "~/.emacs" src emacs-lisp
+    #+END_EXAMPLE
+    
+    第一个参数是包含的文件名。可选的第二个和第三个参数是标记（例如， *example*, *export*, *src* ）。如果标记是 *export* 或者 *src* ，那么就会用language来格式化内容。
+
+    下面有一些例子:
+
+    #+BEGIN_EXAMPLE
+    #+INCLUDE: "~/my-book/chapter2.org" :minlevel 1
+
+    #+INCLUDE: "~/.emacs" :lines "5-10"                             Include lines 5 to 10, 10 excluded
+    #+INCLUDE: "~/.emacs" :lines "-10"                              Include lines 1 to 10, 10 excluded
+    #+INCLUDE: "~/.emacs" :lines "10-"                              Include lines from 10 to EOF
+
+    #+INCLUDE: "./paper.org::#theory" :only-contents t
+    #+INCLUDE: "./paper.org::mytable"                               Include named element
+    #+INCLUDE: "./paper.org::*conclusion" :lines 1-20               Include the  rst 20 lines of the headline named ‘conclusion’.
+    #+END_EXAMPLE
+
+
+    *C-c '* 访问当前光标所在的文件。
+
+
+*** 宏代替
+    你可以定义一个文本片段：
+
+    #+BEGIN_EXAMPLE
+    #+MACRO: name replacement text $1, $2 are arguments
+    #+END_EXAMPLE
+
+    然后你可以引用它 *{{{name(arg1, arg2)}}}* 
+    这些引用，被称为宏，可以插入到 Org 标记可以识别的任何地方： 段落，标题，块， 表格单元和列表。
+    也可以用在关键字接受的 Org 语法。例如: *#+CAPTION*, *#+TITLE*, *#+AUTHOR*, *#+DATE* 或其他。
+
+    这里有一些预定义好的宏可以直接使用：
+
+    * {{{title}}}
+    * {{{author}}}
+    * {{{email}}}
+    * {{{date}}}
+    * {{{date(FORMAT)}}} :: FORMAT 是可以被 *format-time-string* 理解字符串即可
+    * {{{time(FORMAT)}}}
+    * {{{modification-time(FORMAT, VC)}}} :: 同 *format-time-string* 格式
+    * {{{input-file}}}
+    * {{{property(PROPERTY-NAME)}}}
+    * {{{property(PROPERTY-NAME,SEARCH-OPTION)}}}
+
+
+*** 注释行
+    以0个或多个空格开头，然后跟着有一个 *#* 再接着一个空格的会被视为注释。
+    同样地，使用 *#+BEGIN_COMMENT ... #+END_COMMENT* 包起来的，也被视作是注释。
+    注释并不会被导出。
+
+    最后，在入口的开头中有一个 *COMMENT* 关键字的，但后面有其他关键字或优先级配置的，它会注释掉整个子树。
+    可以用命令: *C-c ;* 来操作这个。
+
+
+*** ASCII / Latin-1 / UTF-8 导出
+    *C-c C-e t a/l/u* (M-x org-ascii-export-to-ascii) ， 它会导出到文件
+    *C-c C-e t A/L/U* (M-x org-ascii-export-as-ascii) ， 它会导出到一个临时的buffer，但不创建文件
+
+    你可以插入一些仅使用 ASCII 导出时才会出现的文本:
+
+    *Text @@ascii:and additional text@@ within a paragraph.*
+    或
+    *#+ASCII: Some text*
+    或
+
+    #+BEGIN_EXPORT ascii
+    All lines in this block will appear only when using this back-end.
+    #+END_EXPORT
+
+    ASCII 指定属性
+    #+BEGIN_EXAMPLE
+    #+ATTR_ASCII: :width 10
+    #+END_EXAMPLE
+
+
+    ASCII 特殊块：
+
+    #+BEGIN_JUSTIFYLEFT
+    It's just a jump to the left...
+    #+END_JUSTIFYLEFT
+    #+BEGIN_JUSTIFYRIGHT
+    ...and then a step to the right.
+    #+END_JUSTIFYRIGHT
+
+
+    
+
+*** Beamer 导出
+    
+
+*** HTML 导出
+****  HTML 导出命令
+     *C-c C-e h h*, *C-c C-e h H*
+
+
+**** HTML 导出设置 （用法参考上面的 导出设置 ）
+     - DESCRIPTION :: The document description. This description is inserted as a HTML meta tag. You can use several such keywords if the list is long.
+     - HTML_DOCTYPE :: The document type, e.g. HTML5, (org-html-doctype).
+     - HTML_CONTAINER :: The container, e.g. ‘div’, used to wrap sections and elements (org-html- container-element).
+     - HTML_LINK_HOME :: The home link URL (org-html-link-home)
+     - HTML_LINK_UP :: The up link URL (org-html-link-up).
+     - HTML_MATHJAX :: Options for the MathJax
+     - HTML_HEAD :: Arbitrary lines appended to the end of the head of the document
+     - HTML_HEAD_EXTRA :: Arbitrary lines appended to the end of the header of the document (org-html- head-extra).
+     - KEYWORDS :: The keywords de ning the contents of the document. This description is in- serted as a HTML meta tag. You can use several such keywords if the list is long
+     - LATEX_HEADER :: Arbitrary lines appended to the preamble used when transcoding LATEX fragments to images
+     - SUBTITLE :: The document subtitle.The formatting depends on whether HTML5 in used and on the ‘subtitle’ CSS class.
+
+
+**** HTML 文档类型
+     • “html4-strict”
+     • “html4-transitional” 
+     • “html4-frameset”
+     • “xhtml-strict”
+     • “xhtml-transitional” 
+     • “xhtml-frameset”
+     • “xhtml-11”
+     • “html5”
+     • “xhtml5”
+
+     参考变量 *org-html-doctype-alist* 查看详细情况。默认为 *xhtml-strict*
+
+     HTML5 有一些新的元素类型。默认情况下，Org 不会使用这些元素，但你可以设置 *org-html-html5-fancy* 为非 *nil* 来开启这些块级元素。这些元素是使用 *#+BEGIN* 和 *#+END* 块的。例如:
+
+     #+BEGIN_aside
+     Lorem ipsum
+     #+END_aside
+     
+     将会导出为
+     #+BEGIN_EXAMPLE
+     <aside>
+       <p>Lorem ipsum</p>
+     </aside>
+
+     #+ATTR_HTML: :controls controls :width 350
+     #+BEGIN_video
+     #+HTML: <source src="movie.mp4" type="video/mp4">
+     #+HTML: <source src="movie.ogg" type="video/ogg">
+     Your browser does not support the video tag.
+     #+END_video
+
+     这样子的话，将会导出:
+     
+     #+BEGIN_EXAMPLE
+     <video controls="controls" width="350">
+       <source src="movie.mp4" type="video/mp4">
+       <source src="movie.ogg" type="video/ogg">
+       <p>Your browser does not support the video tag.</p>
+     </video>
+     #+END_EXAMPLE
+     
+
+**** HTML 中的 前言 和 后记
+     *org-html-preamble* 默认值为 *t* ，它意味着插入前言是决定于 *org-html-preamble-format* 字符串的格式。
+     为 *org-html-preamble* 设置一个字符串会覆盖默认值。如果你设置的是一个函数，那么将会插入函数输出的结果，结果必须是字符串。设置为 *nil* 将不插入任何前言。
+
+     *org-html-postamble* 默认值为 *'auto* ，它意味着HTML导出才将查看关于 author, email, creator 和 date 的信息，然后使用这些信息来构建后记。
+     为 *org-html-postamble* 为 *t* 将会从 *org-html-postamble-format* 中插入相应的字符串格式。设置为 *nil* 则不会插入任何后记。
+
+
+**** HTML中的引用标签
+     在HTML导出中，字面的 '<' 与 '>' 总是会被转换为 '&lt;' 和 '&gt;'。
+     如果你想包含原生的 HTML 代码，它仅在HTML导出时出现，可以用 *@@html:* 在 *@@html:<b>@@bold text@@html:</b>@@* 中。
+     使用 :
+     
+     *#+HTML: Literal HTML code for export*
+
+     或 
+
+     #+BEGIN_EXPORT html
+     All lines between these markers are exported literally
+     #+END_EXPORT
+
+
+**** HTML中链接的导出
+     如果链接是另一个 *.org* 文件，那么导出时也会将它翻译为 HTML。可以设置 *org-html-link-org-files-as-html* 为 *nil* 来禁用这转换。
+     如果你想为链接指定属性，可以使用 *#+ATTR_HTML* 来定义这些属性。例如:
+
+     #+BEGIN_EXAMPLE
+     #+ATTR_HTML: :title The Org mode homepage :style color:red;
+     [[http://orgmode.org]]
+     #+END_EXAMPLE
+     
+
+**** HTML 中导出表格
+     默认情况下，使用 *org-html- table-default-attributes* 定义的属性来进行导出。你也可以覆盖该属性：
+
+     #+BEGIN_EXAMPLE
+     #+CAPTION: This is a table with lines around and between cells
+     #+ATTR_HTML: :border 2 :rules all :frame border
+     #+END_EXAMPLE
+
+     下面是在进行HTML导出表格时可以使用的选项:
+
+     * org-html-table-align-individual-fields :: Non-nil means attach style attributes for alignment to each table field
+     * org-html-table-caption-above :: When non-nil, place caption string at the beginning of the table
+     * org-html-table-data-tags :: The opening and ending tags for table data  fields.
+     * org-html-table-default-attributes :: Default attributes and values which will be used in table tags
+     * org-html-table-header-tags :: The opening and ending tags for table header fields.
+     * org-html-table-row-tags :: The opening and ending tags for table rows
+     * org-html-table-use-header-tags-for-first-column :: Non-nil means format column one in tables with header tags
+
+
+**** HTML中导出图片
+     默认情况下，没有带有描述的将作为图片导出，而带有描述的，将作为链接导出。如 '[[file:myimg.jpg]]' 将会显示图片，而 '[[file:myimg.jpg][the image]]' 则不会。
+     如果你需要为那些要导出的图片加上属性：请使用 *#+ATTR_HTML* 例如:
+
+     #+BEGIN_EXAMPLE
+     #+CAPTION: A black cat stalking a spider
+     #+ATTR_HTML: :alt cat/spider image :title Action! :align right
+     [[./img/a.jpg]]
+     #+END_EXAMPLE
+
+
+**** HTML导出数学格式
+     可以通过 *org-html-mathjax-options* 配置显示的格式，或者添加如下行:
+
+     #+BEGIN_EXAMPLE
+     #+HTML_MATHJAX: align: left indent: 5em tagside: left font: Neo-Euler
+     #+END_EXAMPLE
+
+     配置 MathJax 模板: *org-html-mathjax-template*
+
+     也可以用它来处理图片:
+     #+BEGIN_EXAMPLE
+     #+OPTIONS: tex:dvipng
+     #+OPTIONS: tex:dvisvgm
+     #+OPTIONS: tex:imagemagick
+     #+END_EXAMPLE
+
+
+**** text area 在HTML中的导出
+     它是通过作为 *example* 或 *src* 块的  *:textarea* 属性来导出的。例如:
+     
+     #+ATTR_HTML: :textarea t :width 40
+     #+BEGIN_EXAMPLE
+       (defun org-xor (a b)
+          "Exclusive or."
+          (if a (not b) b))
+     #+END_EXAMPLE
+
+
+**** CSS 支持
+     这个需要时再查看这个内容咯
+
+
+**** JS支持
+     这个需要时再查看这个内容咯
+
+
+*** Latex{} 导出
+**** Latex 导出命令
+     *C-c C-e l l* (org-latex-export-to-latex)
+     *C-c C-e l L* (org-latex-export-as-latex)
+     *C-c C-e l p* (org-latex-export-to-pdf)
+     *C-c C-e l o* latex -> pdf -> open PDF file
+
+     Org 支持几种 Latex 引擎导出。可以为 *pdflatex*, *xelatex* 和 *lualatex*. 默认的编译器可通过设置 *org-latex-compiler* 或者使用关键字: *#+LATEX_COMPILER* .
+
+*** Markdown 导出
+
+*** OpenDocument 导出
+
+*** Org 导出
+
+*** Textinfo 导出
+
+*** iCalendar 导出
+
+
+** 第十三章：发布
+
+** 第十四章：处理源码
+   Org 可以处理在 '#+BEGIN_SRC' 与 '#+END_SRC' 标签之间的代码块，格式化它，编译，运行以及显示结果。
+   它的结构:
+
+   #+NAME: <name>
+   #+BEGIN_SRC <language> <switches> <header arguments>
+      <body>
+   #+END_SRC
+
+*** 编辑源码
+    *C-c '* ： 它会打开一个新的 major mode 来编辑src里的源码，完成之后，再按 *C-c '* 来结束编辑。
+    *org-edit-src-auto-save-idle-delay* 在空闲一段时间就自动保存
+    *org-edit-src-turn-on-auto-save* 自动保存
+
+*** 导出代码块
+    *:exports* header arguments 可以控制下面的行为:
+
+    - *:exports code* :: 对绝大语言来说，这个是默认的行为。
+    - *:exports results* :: 只导出它的结果，而不导出源码。
+    - *:exports both* :: 源码和结果都导出
+    - *:exports none* :: 都不导出。
+
+
+
+    这就不继续了，这有比较多与代码块相关的。
+
+** 第十五章：杂项
+*** 补全
+    *M-TAB* :: 补全当前光标的单词
+
+    - 在标题的开始，补全 TODO 关键词
+    - 在 '\' 后面，补全 TEX 符号
+    - 在 '*' 后面，补全当前 buffer 的标题。
+    - 在标题的 ':' 后面，补全标签, 这些标签是从 *org-tag-alist* 中获取，或者 *#+TAGS* 中获取，又或者是当前 buffer 中已经动态创建的标签。
+    - 在非标题的 ':' 后面，补全属性
+    - 在 '[' 后面，补全链接缩写。
+    - 在 '#+' 后面，补全特殊的关键字。
+    - 在 '#+STARTUP:' 后面，补全 startup 关键字。
+    - 在当前光标的任何地方，使用 *ISpell* 补全字典单词。
+
+*** 简单模板
+    先输入 '<'，然后输入下面的一个字母，最后按 TAB 即可。
+
+    #+BEGIN_EXPORT ascii
+    s	#+BEGIN_SRC ... #+END_SRC 
+    e	#+BEGIN_EXAMPLE ... #+END_EXAMPLE
+    q	#+BEGIN_QUOTE ... #+END_QUOTE 
+    v	#+BEGIN_VERSE ... #+END_VERSE 
+    c	#+BEGIN_CENTER ... #+END_CENTER 
+    l	#+BEGIN_LaTeX ... #+END_LaTeX 
+    L	#+LaTeX: 
+    h	#+BEGIN_HTML ... #+END_HTML 
+    H	#+HTML: 
+    a	#+BEGIN_ASCII ... #+END_ASCII 
+    A	#+ASCII: 
+    i	#+INDEX: line 
+    I	#+INCLUDE: line 
+    #+END_EXPORT
+
+
+*** 加速键
+    参考  *org-use-speed-commands* 变量配置。
+
+*** 评估代码以及安全问题
+    
+
+*** 自定义选项
+    *M-x org-customize RET* 或者使用 Org 菜单 *org->customization-browse org group*
+
+    
+*** 总结在 buffer 设置
+    它们是以 *#+* 开头，后接关键字，一个冒号，接着就是各个设置了。
+
+    
+*** 非常繁忙的 C-c C-c 键
+    - 从 sparse tree 或者 clock 显示中的任何高亮中，移除这些高亮
+    - 如果光标在 *#+KEYWORDS* 行，则扫描所有这些行并更新信息
+    - 如果光标在一个表格里，则重排表格。
+    - 如果光标在 *#+TBLFM* 行，则重新应用这些公式到整个表格。
+    - 如果当前是在 capture buffer ，关闭 note 然后文件定位它。
+    - 当光标是在 <<<target>>> ，则更新 radio target
+    - 如果光标是在一个属性行，或者在属性抽屉的开始或结束位置，则提供属性命令。
+    - 如果光标是在一个脚注引用，则跳转到这个定义的地方，也可以来回跳转。
+    - 如果光标是在一个数字排序的列表中，则重排它。
+    - 如果光标是在一个 *#+BEGIN* 行的动态块，则更新这个块
+    - 如果光标是在一个 timestamp 中，则 fix 日期名
+
+
+*** 一个更简洁的标题视图
+    为了开启它，可以使用 *org-indent-mode* （全局）或者 *#+STARTUP: indent* 当前 buffer 中。
+
+
