@@ -1,0 +1,13 @@
+* Org 杂项
+** 启动 spacemacs 时，显示 agenda buffer
+   在 *~/.spacemacs* 配置文件中的 *dotspacemacs/user-config* 位置加入以下配置内容即可.
+
+   #+BEGIN_EXAMPLE
+   (org-agenda-list)
+   (switch-to-buffer "*Org Agenda*")
+   (spacemacs/toggle-maximize-buffer)
+   #+END_EXAMPLE
+
+   [[https://www.reddit.com/r/spacemacs/comments/5lxwog/how_to_display_orgagenda_list_at_startup/][reddit
+
+]]
