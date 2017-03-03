@@ -68,7 +68,41 @@
 ** 语言代码列表
    [[https://www.loc.gov/standards/iso639-2/php/code_list.php][iso language code]]
 
+
+** 加密 Org 文件
+   添加以下的配置到你的 init 文件
+   #+BEGIN_EXAMPLE
+   (require 'org-crypt)
+   (org-crypt-use-before-save-magic)
+   (setq org-tags-exclude-from-inheritance (quote("crypt")))
+   (setq org-crypt-key nil)
+   #+END_EXAMPLE
    
+*** 加密   
+    1. 为需要加密的标题添加crypt标签
+    2. 保存文件
+    3. 该标题下的所有内容都被加密了（包含子标题）
+
+
+*** 解密
+    1. 将光标移动到需要解密的标题上
+    2. M-x org-decrypt-entry
+    3. 解密后的内容将出现的Buffer中
+
+
+    
+*** 取消加密
+    1. 为指定的标题删除crypt标签，并保存即可
+
+
+*** 禁用备份
+    1. 全局禁用 ==>  (setq auto-save-default nil)
+    2. 局部禁用 ==>  # -*- buffer-auto-save-file-name: nil; -*-
+
+
+*** 参考资料
+    - http://www.jianshu.com/p/cf43baf957a5
+
 *  Org 手册
 
 ** 第一章：介绍
