@@ -120,3 +120,16 @@ Each entry is either:
      )
       #+END_EXAMPLE
    5. 重启后即可（或调用 *spacemacs/restart-emacs* ）
+** 多光标编辑
+   这里，以一个具体的例子来进行多光标编辑。假设有一段文本：
+   #+BEGIN_EXAMPLE
+   hello world
+   hello1 world
+   hello2 world
+   #+END_EXAMPLE
+
+   现在想在每个 *hello* 字符串进行多光标编辑如下:
+   
+   1. 将光标移动到第一行的 *hello* 开头。然后调用( *M-x set-mark-command RET* ),选取 *hello*
+   2. 这时，再调用 ( *M-x iedit-mode RET* )
+   3. 这时，就是多光标编辑环境了，随便输入什么，它都会在所有匹配到 *hello* 字符串所在的位置进行同时编辑了。
