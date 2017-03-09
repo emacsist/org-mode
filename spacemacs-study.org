@@ -1,4 +1,4 @@
-* Org 杂项
+* Emacs 杂项
 ** 启动 spacemacs 时，显示 agenda buffer
    在 *~/.spacemacs* 配置文件中的 *dotspacemacs/user-config* 位置加入以下配置内容即可.
 
@@ -133,3 +133,45 @@ Each entry is either:
    1. 将光标移动到第一行的 *hello* 开头。然后调用( *M-x set-mark-command RET* ),选取 *hello*
    2. 这时，再调用 ( *M-x iedit-mode RET* )
    3. 这时，就是多光标编辑环境了，随便输入什么，它都会在所有匹配到 *hello* 字符串所在的位置进行同时编辑了。
+** Emacs中使用 restclient 报  *url-http-create-request: Multibyte text in HTTP request*
+   发现emacs里有个非常好用的 HTTP 客户端: [[https://github.com/pashky/restclient.el][restclient]] 但是在emacs 25.1中发现使用中文请求参数时，报 'multibyte' 的问题。
+   然后Google了一下，有篇文章帮忙解决了这个问题：[[http://www.cnblogs.com/yangwen0228/p/6238528.html][cnblogs]] 下面是具体的步骤（这里以 Mac 下的 emacs 25.1为例）
+   1. 定位到emacs的库文件 *url-http.el.gz* （因为我使用的是 *brew* 来安装的）, 它的文件在:
+
+      #+BEGIN_EXAMPLE
+      [12:47:03] emacsist:lisp $ ls -alh /usr/local/Cellar/emacs/25.1/share/emacs/25.1/lisp/url/url-http.el*
+      -rw-r--r-- 1 emacsist admin 17K  3  9 12:32 /usr/local/Cellar/emacs/25.1/share/emacs/25.1/lisp/url/url-http.el.gz
+      -rw-r--r-- 1 emacsist admin 37K  3  9 12:34 /usr/local/Cellar/emacs/25.1/share/emacs/25.1/lisp/url/url-http.elc
+      [12:47:05] emacsist:lisp $
+      #+END_EXAMPLE
+
+   2. 用 *emacs* 编辑文件 *url-http.el.gz* （ *url-http.elc* 是编译之后的文件），将下面的内容:
+      #+BEGIN_EXAMPLE
+      ;; Bug#23750
+      (unless (= (string-bytes request)
+           (length request))
+           (error "Multibyte text in HTTP request: %s" request))
+      #+END_EXAMPLE
+      修改为如下:
+      #+BEGIN_EXAMPLE
+      ;; Bug#23750
+      (setq request (url-http--encode-string request))
+      (unless (= (string-bytes request)
+           (length request))
+           (error "Multibyte text in HTTP request: %s" request))
+      #+END_EXAMPLE
+      然后保存（注意不要退出）
+
+   3. 编译文件（当前 *emacs* 已经打开了该文件）:
+      直接输入下在的命令即可: *M-x byte-compile-file RET* 这样子 *emacs* 就会将当前文件编译好了。
+      重启 *emacs* 即可生效。下面是 *restclient* 修改后的输出例子:
+
+      #+BEGIN_EXAMPLE
+      中文
+      // GET http://localhost:8380/av?text=中文
+      // HTTP/1.1 200 
+      // Content-Type: text/plain;charset=UTF-8
+      // Content-Length: 6
+      // Date: Thu, 09 Mar 2017 04:39:51 GMT
+      // Request duration: 0.282388s
+      #+END_EXAMPLE
